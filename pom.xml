@@ -1,0 +1,163 @@
+<!--
+
+    Copyright 2023, Province of British Columbia
+     All rights reserved.
+
+-->
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+
+	<groupId>ca.bc.gov.ols</groupId>
+	<artifactId>ols-router-test-kit</artifactId>
+	<version>1.0.0-SNAPSHOT</version>
+	<packaging>pom</packaging>
+	<name>OLS Router</name>
+
+	<organization>
+		<name>Province of British Columbia</name>
+		<url>http://www.gov.bc.ca/</url>
+	</organization>
+
+	<scm>
+		<connection>scm:git:git://github.com/bcgov/ols-router-test-kit.git</connection>
+		<developerConnection>scm:git:[fetch=]git://github.com/bcgov/ols-router-test-kit.git[push=]git@github.com:bcgov/ols-router-test-kit.git</developerConnection>
+		<url>https://github.com/bcgov/ols-router-test-kit</url>
+	</scm>
+
+	<licenses>
+		<license>
+			<name>Apache License, Version 2.0</name>
+			<url>https://www.apache.org/licenses/LICENSE-2.0.txt</url>
+		</license>
+	</licenses>
+
+	<properties>
+		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+		<springframework.version>6.0.10</springframework.version>
+		<springframework.security.version>6.1.1</springframework.security.version>
+		<springboot.version>3.1.1</springboot.version>
+		<junit.jupiter.version>5.9.3</junit.jupiter.version>
+		<maven-surefire-plugin.version>3.1.2</maven-surefire-plugin.version>
+		<slf4j.version>2.0.7</slf4j.version>
+		<logback.version>1.4.8</logback.version>
+		<jts.version>1.19.0</jts.version>
+	</properties>
+
+	<modules>
+		<module>ols-router-test-engine</module>
+		<module>ols-router-test-web</module>
+	</modules>
+
+	<build>
+		<plugins>
+			<plugin>
+				<artifactId>maven-surefire-plugin</artifactId>
+				<version>${maven-surefire-plugin.version}</version>
+				<configuration>
+					<groups>Prod</groups>
+					<excludedGroups>Dev</excludedGroups>
+				</configuration>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-compiler-plugin</artifactId>
+				<version>3.11.0</version>
+				<configuration>
+					<release>17</release>
+				</configuration>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-source-plugin</artifactId>
+				<version>3.2.1</version>
+				<configuration>
+					<includePom>true</includePom>
+				</configuration>
+				<executions>
+					<execution>
+						<id>attach-sources</id>
+						<phase>verify</phase>
+						<goals>
+							<goal>jar-no-fork</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-javadoc-plugin</artifactId>
+				<version>3.5.0</version>
+				<executions>
+					<execution>
+						<id>javadoc-html</id>
+						<phase>install</phase>
+						<configuration>
+							<quiet>true</quiet>
+							<show>public</show>
+						</configuration>
+						<goals>
+							<goal>jar</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
+		</plugins>
+
+	</build>
+
+	<dependencyManagement>
+		<dependencies>
+			<dependency>
+				<groupId>org.junit.jupiter</groupId>
+				<artifactId>junit-jupiter</artifactId>
+				<version>${junit.jupiter.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.junit.jupiter</groupId>
+				<artifactId>junit-jupiter-engine</artifactId>
+				<version>${junit.jupiter.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.slf4j</groupId>
+				<artifactId>slf4j-api</artifactId>
+				<version>${slf4j.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>ch.qos.logback</groupId>
+				<artifactId>logback-classic</artifactId>
+				<version>${logback.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.locationtech.jts</groupId>
+				<artifactId>jts-core</artifactId>
+				<version>${jts.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>ca.bc.gov.ols</groupId>
+				<artifactId>ols-util</artifactId>
+				<version>${ols-util.version}</version>
+			</dependency>
+		</dependencies>
+	</dependencyManagement>
+
+	<dependencies>
+		<dependency>
+			<groupId>org.postgresql</groupId>
+			<artifactId>postgresql</artifactId>
+			<version>42.6.0</version>
+		</dependency>
+	</dependencies>
+
+	<distributionManagement>
+		<repository>
+			<id>central</id>
+			<name>artifactory-ha-primary-0-releases</name>
+			<url>https://artifacts.developer.gov.bc.ca/artifactory/g988-release</url>
+		</repository>
+		<snapshotRepository>
+			<id>snapshots</id>
+			<name>artifactory-ha-primary-0-snapshots</name>
+			<url>https://artifacts.developer.gov.bc.ca/artifactory/g988-snapshot</url>
+		</snapshotRepository>
+	</distributionManagement>
+</project>
