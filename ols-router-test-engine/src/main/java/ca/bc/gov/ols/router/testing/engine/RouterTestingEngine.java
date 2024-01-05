@@ -70,10 +70,10 @@ public class RouterTestingEngine {
 	
 	/*
 	 * This Test engine looks in the application.properties specified Database and checks for any "Runs" that have a status of "queued"
-	 * if so, it runs the test, sets the run_date to today and sets the status to "complete"
+	 * if so, it runs the specified test, sets the "run" object's 'run_date' to today and 'status' to 'complete'
 	 * 
 	 * Results are saved by default
-	 * Set OLS-ROUTER-SAVE-RESULTS  in your system variables to be "false" if you do no want to save results 
+	 * Set an environment variable OLS-ROUTER-SAVE-RESULTS in your system variables to be "false" if you do no want to save results 
 	 */
 	public static void main(String[] args) {
 		SpringApplication.run(RouterTestingEngine.class, args);
@@ -89,7 +89,7 @@ public class RouterTestingEngine {
 		
 		for(Run run: runList) {
 			
-			//double check the status in case it has changed while running previous tests etc, quit/end if it has changed.
+			//double check the status in case it has changed while running previous tests etc, end the process if it has changed.
 			Run latestRun = runRepository.findById(run.getRunId()).get();
 			if( ! "queued".contentEquals(latestRun.getStatus())) {
 				System.out.println("RunID: " + run.getRunId() + " was no longer in status 'queued' when we attempted to run it. A different server processed it or a user changed the status unexpectantly. Ending the current Engine's test runs.");
@@ -226,8 +226,7 @@ public class RouterTestingEngine {
 		String partition = (String)attributes.get("partition");
 		if("isTruckRoute".equals(partition)) {
 			ArrayList list = (ArrayList)attributes.get("partitions");
-			//JsonElement jsonele = new JsonParser().parse(list);
-			//JsonArray jsonArray = jsonele.getAsJsonArray();
+
 			for (int i = 0; i < list.size(); i++) {
 				LinkedTreeMap ele = (LinkedTreeMap) list.get(i);
 				Map<Object,Object> m = gson.fromJson(content,Map.class);
