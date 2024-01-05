@@ -1,10 +1,13 @@
 <!--
 
     Copyright 2023, Province of British Columbia
-     All rights reserved.
+     All rights
+reserved.
 
 -->
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 
 	<groupId>ca.bc.gov.ols</groupId>
@@ -20,7 +23,8 @@
 
 	<scm>
 		<connection>scm:git:git://github.com/bcgov/ols-router-test-kit.git</connection>
-		<developerConnection>scm:git:[fetch=]git://github.com/bcgov/ols-router-test-kit.git[push=]git@github.com:bcgov/ols-router-test-kit.git</developerConnection>
+		<developerConnection>
+			scm:git:[fetch=]git://github.com/bcgov/ols-router-test-kit.git[push=]git@github.com:bcgov/ols-router-test-kit.git</developerConnection>
 		<url>https://github.com/bcgov/ols-router-test-kit</url>
 	</scm>
 
@@ -41,6 +45,9 @@
 		<slf4j.version>2.0.7</slf4j.version>
 		<logback.version>1.4.8</logback.version>
 		<jts.version>1.19.0</jts.version>
+		<hibernate.version>6.1.7.Final</hibernate.version>
+		<gson.version>2.6.2</gson.version>
+		<jackson.version>2.16.1</jackson.version>
 	</properties>
 
 	<modules>
@@ -137,16 +144,74 @@
 				<artifactId>ols-util</artifactId>
 				<version>${ols-util.version}</version>
 			</dependency>
+			<dependency>
+				<groupId>org.springframework.boot</groupId>
+				<artifactId>spring-boot-starter-web</artifactId>
+				<version>${springboot.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.springframework.boot</groupId>
+				<artifactId>spring-boot-starter</artifactId>
+				<version>${springboot.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.springframework.boot</groupId>
+				<artifactId>spring-boot-starter-jdbc</artifactId>
+				<version>${springboot.version}</version>
+
+			</dependency>
+			<dependency>
+				<groupId>org.springframework.boot</groupId>
+				<artifactId>spring-boot-starter-test</artifactId>
+				<version>${springboot.version}</version>
+				<scope>test</scope>
+			</dependency>
+			<dependency>
+				<groupId>org.springframework.boot</groupId>
+				<artifactId>spring-boot-starter-data-jpa</artifactId>
+				<version>${springboot.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.postgresql</groupId>
+				<artifactId>postgresql</artifactId>
+				<version>42.6.0</version>
+			</dependency>
+			<dependency>
+				<groupId>org.hibernate</groupId>
+				<artifactId>hibernate-core</artifactId>
+				<version>${hibernate.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.hibernate</groupId>
+				<artifactId>hibernate-spatial</artifactId>
+				<version>${hibernate.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>com.google.code.gson</groupId>
+				<artifactId>gson</artifactId>
+				<version>${gson.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>com.fasterxml.jackson.core</groupId>
+				<artifactId>jackson-core</artifactId>
+				<version>${jackson.version}</version>
+			</dependency>
+
+			<dependency>
+				<groupId>com.fasterxml.jackson.core</groupId>
+				<artifactId>jackson-annotations</artifactId>
+				<version>${jackson.version}</version>
+			</dependency>
+
+			<dependency>
+				<groupId>com.fasterxml.jackson.core</groupId>
+				<artifactId>jackson-databind</artifactId>
+				<version>${jackson.version}</version>
+			</dependency>
 		</dependencies>
+
 	</dependencyManagement>
 
-	<dependencies>
-		<dependency>
-			<groupId>org.postgresql</groupId>
-			<artifactId>postgresql</artifactId>
-			<version>42.6.0</version>
-		</dependency>
-	</dependencies>
 
 	<distributionManagement>
 		<repository>

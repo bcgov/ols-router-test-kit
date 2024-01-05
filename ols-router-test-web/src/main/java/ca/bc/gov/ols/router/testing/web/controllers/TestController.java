@@ -8,10 +8,11 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import ca.bc.gov.ols.router.testing.web.RouterTestingApplication;
-
+/*
 @RestController
-@RequestMapping("/tests")
+@RequestMapping("/")
 @CrossOrigin
+*/
 public class TestController {
 
 	// can potentially open the db connection in the app, then use this reference to retrieve it
@@ -19,7 +20,7 @@ public class TestController {
 	@Autowired 
 	private RouterTestingApplication app;
 	
-	@RequestMapping(value = "/")
+	@RequestMapping(value = "/test1")
 	public ResponseEntity<String> getTests() {
 		// TODO: query the database to get all the tests (probably needs pagination)
 		// return the test info as JSON array
