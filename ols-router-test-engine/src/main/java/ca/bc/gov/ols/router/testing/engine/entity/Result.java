@@ -2,6 +2,12 @@ package ca.bc.gov.ols.router.testing.engine.entity;
 
 import org.locationtech.jts.geom.Geometry;
 
+import com.fasterxml.jackson.annotation.JsonView;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import org.n52.jackson.datatype.jts.GeometrySerializer;
+import org.n52.jackson.datatype.jts.GeometryDeserializer;
+
 import jakarta.annotation.Nonnull;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -10,6 +16,7 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.SequenceGenerator;
 import jakarta.persistence.Table;
+
 
 @Entity
 @Table(name = "results")
@@ -21,20 +28,37 @@ public class Result{
 	 @SequenceGenerator(name="identifier", sequenceName="results_result_id_seq", allocationSize=1)
 	 @GeneratedValue(strategy=GenerationType.SEQUENCE, generator="identifier")
 	 @Nonnull
+	 @JsonView(View.Default.class)
 	int resultId;
 	
 	@Column(name="run_id")
+	@JsonView(View.Default.class)
 	Integer runId;
+	
 	@Column(name="test_id")
+	@JsonView(View.Default.class)
 	Integer testId;
+	
 	@Column(name="calc_time")
+	@JsonView(View.Default.class)
 	Double calcTime;
+	
+	@JsonView(View.Default.class)
 	Double distance;
+	
+	@JsonSerialize(using = GeometrySerializer.class)
+    @JsonDeserialize(contentUsing = GeometryDeserializer.class)
 	Geometry geom;
+	
+	@JsonView(View.Default.class)
 	Double duration;
+	
 	@Column(name="partition_signature")
+	@JsonView(View.Default.class)
 	String partitionSignature;
+	
 	@Column(name="partition_indices")
+	@JsonView(View.Default.class)
 	String partitionIndices;
 
 	

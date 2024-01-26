@@ -3,19 +3,19 @@
       <div>RouterNG Testing Framework</div>
       <div id="tabs">
         <div><RouterLink :to="{name:'runs'}">Runs</RouterLink></div>
-        <div>Bulk Tests</div>
-        <div>Custom Tests</div>
-        <div>Results</div>
+        <div><RouterLink :to="{name:'bulkTests'}">Bulk Tests</RouterLink></div>
+        <div><RouterLink :to="{name:'customTests'}">Custom Tests</RouterLink></div>
+        <div><RouterLink :to="{name:'results'}">Results</RouterLink></div>
       </div>
-      <div></div>
+      
     </div>
 </template>
 
 <script>
 import { RouterLink} from 'vue-router'
 
-export default {
-}
+export default {}
+
 
 </script>
 
@@ -53,16 +53,19 @@ export default {
 	color: Navy;
 	margin-bottom: -1px;
 }
-#tabs div.active {
-	border: 1px solid Black;
-	background-color: White;
-	font-weight: bold;
-	border-bottom-color: transparent;
+#tabs router-link-active {
+  	font-weight: bold;
+	  border-bottom-color: transparent;
 }
 #tabs div a,
 #tabs div a:active,
 #tabs div a:visited {
 	color: Navy;
   text-decoration: none;
+}
+
+router-link-active {
+  color: var(--color-text-link);
+  font-weight: bold;
 }
 </style>

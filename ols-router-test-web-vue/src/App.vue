@@ -26,7 +26,7 @@ import Navigation from './components/Navigation.vue'
 	flex: 1 1 auto;
 	overflow: auto;
 	margin: 0px;
-	background-color: white;
+	background: var(--color-background);
 	padding: 0 20px 0 20px;
 }
 </style>

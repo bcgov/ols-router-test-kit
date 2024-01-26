@@ -1,10 +1,11 @@
 package ca.bc.gov.ols.router.testing.engine.entity;
 
-import java.util.Map;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 
 import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.type.SqlTypes;
@@ -18,6 +19,7 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
+
 
 @Entity
 @Table(name = "tests")
@@ -40,6 +42,8 @@ public class Test{
 	String points;
 	@JdbcTypeCode(SqlTypes.JSON)
 	JsonNode parameters; 
+	@Column(name="created_date")
+	LocalDate createdDate;
 	
 	
 	public Test() {}
@@ -175,5 +179,16 @@ public class Test{
 		this.parameters = parameters;
 	}
 
+
+	public LocalDate getCreatedDate() {
+		return createdDate;
+	}
+
+
+	public void setCreatedDate(LocalDate createdDate) {
+		this.createdDate = createdDate;
+	}
+
+	
 
 }
