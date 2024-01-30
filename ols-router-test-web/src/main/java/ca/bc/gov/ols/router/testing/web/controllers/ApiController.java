@@ -388,20 +388,13 @@ public class ApiController {
 	 * Returns specific results from the database 
 	 * @param ids - a comma separated list of result_ids the users wants details on  	 */
 	@RequestMapping("/getResults")
-	public List<Result> getResults(@RequestParam String ids) {
+	public List<Result> getResults(@RequestParam List<Integer> ids) {
 		List<Result> resultList = new ArrayList<Result>();
 		
-		String[] idList = ids.split(",");
-		for (String id : idList){
-			try {
-				Integer idInt = Integer.valueOf(id);
-			
-				Optional<Result> result = resultRepository.findById(idInt);
-				if (!result.isEmpty()){
-					resultList.add(result.get());
-				}
-			}catch (Exception e){
-				throw new InvalidParameterException("Invalid parameter value given. " + e.getMessage());
+		for (Integer id : ids){
+			Optional<Result> result = resultRepository.findById(id);
+			if (!result.isEmpty()){
+				resultList.add(result.get());
 			}
 		}
 		return resultList;
