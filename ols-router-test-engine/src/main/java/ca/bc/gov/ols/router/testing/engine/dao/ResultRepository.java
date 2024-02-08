@@ -10,7 +10,6 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Component;
 
-import ca.bc.gov.ols.router.testing.engine.entity.ComparedResult;
 import ca.bc.gov.ols.router.testing.engine.entity.Result;
 import jakarta.annotation.Resource;
 
@@ -66,8 +65,8 @@ public interface ResultRepository extends JpaRepository <Result, Integer> {
 			+ "    t.notes as notes"
 			+ "  FROM Result b JOIN Test t on b.testId = t.testId"
 			+ "    LEFT JOIN Run r ON b.runId = r.runId"
-			+ "    LEFT JOIN Result a ON (r.forwardRoute AND t.forwardResultId = a.resultId)"
-			+ "      OR (NOT r.forwardRoute AND t.reverseResultId = a.resultId)"
+			+ "    LEFT JOIN Result a ON (r.forwardRouteInd AND t.forwardResultId = a.resultId)"
+			+ "      OR (NOT r.forwardRouteInd AND t.reverseResultId = a.resultId)"
 			+ "  WHERE b.runId = :runId AND t.groupName = 'Custom'")
 	List<Map> compareRunVsRef(@Param("runId") Integer runId, Pageable pageable);
 
@@ -77,9 +76,23 @@ public interface ResultRepository extends JpaRepository <Result, Integer> {
 	@Query(value ="SELECT count(*) "
 			+ "  FROM Result b JOIN Test t on b.testId = t.testId"
 			+ "    LEFT JOIN Run r ON b.runId = r.runId"
-			+ "    LEFT JOIN Result a ON (r.forwardRoute AND t.forwardResultId = a.resultId)"
-			+ "      OR (NOT r.forwardRoute AND t.reverseResultId = a.resultId)"
+			+ "    LEFT JOIN Result a ON (r.forwardRouteInd AND t.forwardResultId = a.resultId)"
+			+ "      OR (NOT r.forwardRouteInd AND t.reverseResultId = a.resultId)"
 			+ "  WHERE b.runId = :runId AND t.groupName = 'Custom'")
 	Integer compareRunVsRefCount(@Param("runId") Integer runId);
 	
+	
+	/*
+	 * Query that gets the main run table with sub-queries etc
+	 */
+	@Query(value ="SELECT r.runId as runId, r.forwardRouteInd as forwardRouteInd, "
+		    + "  re.resultId as resultId, re.calcTime as calcTime, re.distance as distance, re.duration as duration, "
+		    + "  concat(e.platform, ' - ', e.environment) as environment, "
+		    + "  concat(d.roadSource, ' ', d.roadNetworkTimestamp, ' - ', d.description) as dataset "
+		    + " FROM Result re "
+		    + " JOIN Run r on re.runId = r.runId "
+		    + " LEFT JOIN Dataset d ON r.datasetId = d.datasetId "
+		    + " LEFT JOIN Environment e ON r.environmentId = e.environmentId "
+		  	+ " WHERE re.testId = :testId ")
+	List<Map> getResultListForTest(@Param("testId") int testId, Pageable pageable);
 }

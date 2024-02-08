@@ -48,7 +48,8 @@ public class Result{
 	
 	@JsonSerialize(using = GeometrySerializer.class)
     @JsonDeserialize(contentUsing = GeometryDeserializer.class)
-	Geometry geom;
+	@Column(name="route_geometry")
+	Geometry routeGeometry;
 	
 	@JsonView(View.Default.class)
 	Double duration;
@@ -63,22 +64,19 @@ public class Result{
 
 	
 	public Result() {}
-	
-	public Result(int runId, int testId, double calcTime, double distance, Geometry geometry, double duration, String partitionSignature, String partitionIndices) {
-	    this.runId = runId; 
-	    this.testId = testId;
-	    this.calcTime = calcTime;
-	    this.distance = distance;
-	    this.geom = geometry;
-	    this.duration = duration;
-	    this.partitionSignature = partitionSignature;
-	    this.partitionIndices = partitionIndices;
-	  }
-	/*
-	public Result(Object object1, Object object2, Object object3, Object object4, Object object5, Object object6,
-			Object object7, Object object8) {
-		this(Integer.parseInt((String) object1), Double.parseDouble((String) object2), Double.parseDouble((String) object3), object4, Double.parseDouble((String) object5), object6, object7, object8);
-	}*/
+
+	public Result(Integer runId, Integer testId, Double calcTime, Double distance, Geometry routeGeometry,
+			Double duration, String partitionSignature, String partitionIndices) {
+		super();
+		this.runId = runId;
+		this.testId = testId;
+		this.calcTime = calcTime;
+		this.distance = distance;
+		this.routeGeometry = routeGeometry;
+		this.duration = duration;
+		this.partitionSignature = partitionSignature;
+		this.partitionIndices = partitionIndices;
+	}
 
 	public int getResultId() {
 		return resultId;
@@ -120,12 +118,13 @@ public class Result{
 		this.distance = distance;
 	}
 
-	public Geometry getGeom() {
-		return geom;
+
+	public Geometry getRouteGeometry() {
+		return routeGeometry;
 	}
 
-	public void setGeom(Geometry geom) {
-		this.geom = geom;
+	public void setRouteGeometry(Geometry routeGeometry) {
+		this.routeGeometry = routeGeometry;
 	}
 
 	public Double getDuration() {

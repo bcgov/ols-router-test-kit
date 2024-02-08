@@ -6,6 +6,8 @@
         <div><RouterLink :to="{name:'bulkTests'}">Bulk Tests</RouterLink></div>
         <div><RouterLink :to="{name:'customTests'}">Custom Tests</RouterLink></div>
         <div><RouterLink :to="{name:'results'}">Results</RouterLink></div>
+        <div><RouterLink :to="{name:'createNew'}">Create New Tests/Env/...</RouterLink></div>
+        <div><RouterLink :to="{name:'createRun'}">Queue New Router Run</RouterLink></div>
       </div>
       
     </div>
@@ -20,6 +22,7 @@ export default {}
 </script>
 
 <style scoped>
+
 #menuBar {
     flex: 0 0 auto;
     font-size: 18px;
@@ -63,8 +66,7 @@ export default {}
 	color: Navy;
   text-decoration: none;
 }
-
-router-link-active {
+.router-link-active {
   color: var(--color-text-link);
   font-weight: bold;
 }

@@ -4,40 +4,40 @@
     <div class="p-1 fw-bold border-bottom mb-2">Bulk Tests </div>
     <div>Table Description: A large set of simple test without specific routing parameters. Each test is simple a start and end point, meant to provide a large coverage of routing areas and possible use cases.</div>
     <div> &nbsp</div>
-    <div> Displaying Rows {{ ((pageNum-1) * perPage) }} to {{ ((pageNum-1) * perPage) + curPageCount }} out of {{rowCount}} rows:</div>
+    <div> Displaying Rows {{ ((pageNum-1) * perPage)+1 }} to {{ ((pageNum-1) * perPage) + curPageCount }} out of {{rowCount}} rows:</div>
     <table class="table table-striped table-sm">
       <tbody>
         <tr>
         <th class="thLink" @click="setSortBy('testId')"> Test ID 
           <template v-if="(this.sortBy === 'testId' && this.descending )">
-              &gt;
+              ▼
           </template>
           <template v-if="(this.sortBy === 'testId' && !this.descending )">
-              &lt;
+              ▲
           </template>
         </th>
         <th class="thLink" @click="setSortBy('description')"> Description 
           <template v-if="(this.sortBy === 'description' && this.descending )">
-              &gt;
+              ▼
           </template>
           <template v-if="(this.sortBy === 'description' && !this.descending )">
-              &lt;
+              ▲
           </template>
         </th>
         <th class="thLink" @click="setSortBy('groupName')"> Group Name 
           <template v-if="(this.sortBy === 'groupName' && this.descending )">
-              &gt;
+              ▼
           </template>
           <template v-if="(this.sortBy === 'groupName' && !this.descending )">
-              &lt;
+              ▲
           </template>
         </th>
         <th class="thLink" @click="setSortBy('points')">Coordinates
           <template v-if="(this.sortBy === 'points' && this.descending )">
-              &gt;
+              ▼
           </template>
           <template v-if="(this.sortBy === 'points' && !this.descending )">
-              &lt;
+              ▲
           </template>
         </th>
       </tr>
@@ -89,14 +89,14 @@ export default {
     updateTable(){
       var zeroBasePageNum = this.pageNum - 1
       axios
-        .get('http://localhost:8080/bulkTests?pageNumber=' + zeroBasePageNum + '&perPage=' + this.perPage + '&sortBy=' + this.sortBy + '&descending=' + this.descending)
+        .get(this.ApiUrl + '/bulkTests?pageNumber=' + zeroBasePageNum + '&perPage=' + this.perPage + '&sortBy=' + this.sortBy + '&descending=' + this.descending)
         .then(response => {
           this.bulkTests = response.data
           this.curPageCount = this.bulkTests.length 
         })
 
         axios
-        .get('http://localhost:8080/bulkTestsCount')
+        .get(this.ApiUrl + '/bulkTestsCount')
         .then(response => {
           this.rowCount = response.data
           this.maxPages = Math.ceil(this.rowCount / this.perPage)

@@ -13,18 +13,18 @@
       </tr>
 
       <tr>
-        <td>Run Date:</td>
-        <td>{{ run.runDate }}</td>
+        <td>Run Timestamp:</td>
+        <td>{{ formatDate(run.runTimestamp) }}</td>
       </tr>
 
       <tr>
         <td>Environment Name:</td>
-        <td>{{ environment.environment }}</td>
+        <td>{{ environment.platform + " ("+ environment.baseApiUrl + ") - " + environment.environment }}</td>
       </tr>
 
       <tr>
         <td>Data Set:</td>
-        <td>{{ dataset.description }}</td>
+        <td>{{ dataset.roadSource + " - " + formatDate(dataset.roadNetworkTimestamp) + " - " + dataset.description }}</td>
       </tr>
 
       <tr>
@@ -42,58 +42,60 @@
     <div class="p-1 fw-bold border-bottom mb-2">Results for Run Id: {{ runId }} </div>
     <div>Table Description: A list of all results that are associated to this Run Id. Click the "See on Map" button to review the calculated route. <p>The Partition Signature is encoded data describing how the route uses truck routes(1's) and non-truck routes(0's).  e.g. "010" means the route started as non-truck, went onto a truck route, then finished on a non-truck route.</p></div>
     <div> &nbsp</div>
-    <div> Displaying Rows {{ ((pageNum-1) * perPage) }} to {{ ((pageNum-1) * perPage) + curPageCount }} out of {{rowCount}} rows:</div>
+    <div> Displaying Rows {{ ((pageNum-1) * perPage)+1 }} to {{ ((pageNum-1) * perPage) + curPageCount }} out of {{rowCount}} rows:</div>
     <table class="table table-striped table-sm">
       <tbody>
         <tr>
         <th class="thLink" @click="setSortBy('testId')"> Test ID 
           <template v-if="(this.sortBy === 'testId' && this.descending )">
-              &gt;
+              ▼
           </template>
           <template v-if="(this.sortBy === 'testId' && !this.descending )">
-              &lt;
+              ▲
           </template>
         </th>
          <th class="thLink" @click="setSortBy('distance')"> Distance 
           <template v-if="(this.sortBy === 'distance' && this.descending )">
-              &gt;
+              ▼
           </template>
           <template v-if="(this.sortBy === 'distance' && !this.descending )">
-              &lt;
+              ▲
           </template>
         </th>
         <th class="thLink" @click="setSortBy('duration')"> Duration 
           <template v-if="(this.sortBy === 'duration' && this.descending )">
-              &gt;
+              ▼
           </template>
           <template v-if="(this.sortBy === 'duration' && !this.descending )">
-              &lt;
+              ▲
           </template>
         </th>
         <th class="thLink" @click="setSortBy('calcTime')"> Calc Time
           <template v-if="(this.sortBy === 'calcTime' && this.descending )">
-              &gt;
+              ▼
           </template>
           <template v-if="(this.sortBy === 'calcTime' && !this.descending )">
-              &lt;
+              ▲
           </template>
         </th>
         <th class="thLink" @click="setSortBy('partitionSignature')"> Partition Signature
           <template v-if="(this.sortBy === 'partitionSignature' && this.descending )">
-              &gt;
+              ▼
           </template>
           <template v-if="(this.sortBy === 'partitionSignature' && !this.descending )">
-              &lt;
+              ▲
           </template>
         </th>
+        <th></th>
 
       </tr>
         <tr v-for="result in results" >  
           <td> <router-link :to="{name:'test',params:{testId:result.testId}}">{{ result.testId }} </router-link> </td>
-          <td> {{ result.distance}} </td>
-          <td> {{ result.duration }}</td>
-          <td> {{ result.calcTime  }}</td>
-          <td> {{ result.partitionSignature }} </td>
+          <td class="right"> {{ result.distance}} </td>
+          <td class="right"> {{ Math.ceil(result.duration) }}</td>
+          <td class="right"> {{ result.calcTime  }}</td>
+          <td class="right"> {{ result.partitionSignature }} </td>
+          <td><button @click="showOnMap(result.resultId)">Show on Map</button></td>
         </tr>
       </tbody>
     </table>
@@ -135,20 +137,20 @@ export default {
   computed: {},
   methods: {
     initPage(){
-      this.sortBy = "TestId"
+      this.sortBy = "testId"
       axios
-        .get('http://localhost:8080/run?runId=' + this.runId)
+        .get(this.ApiUrl + '/run?runId=' + this.runId)
         .then(response =>{
           this.run = response.data
           if(this.run.environmentId){
             axios
-              .get('http://localhost:8080/environment?envId=' + this.run.environmentId) 
+              .get(this.ApiUrl + '/environment?envId=' + this.run.environmentId) 
               .then(response => (this.environment = response.data))
           }
 
           if(this.run.datasetId){
             axios
-              .get('http://localhost:8080/dataset?datasetId=' + this.run.datasetId) 
+              .get(this.ApiUrl + '/dataset?datasetId=' + this.run.datasetId) 
               .then(response => (this.dataset = response.data))
           }
         })
@@ -157,7 +159,7 @@ export default {
       
       var zeroBasePageNum = this.pageNum - 1
       axios
-        .get('http://localhost:8080/results?filterColumn=runId&filterValue=' + this.runId + '&pageNumber=' + zeroBasePageNum + '&perPage=' + this.perPage + '&sortBy=' + this.sortBy + '&descending=' + this.descending)
+        .get(this.ApiUrl + '/results?filterColumn=runId&filterValue=' + this.runId + '&pageNumber=' + zeroBasePageNum + '&perPage=' + this.perPage + '&sortBy=' + this.sortBy + '&descending=' + this.descending)
         .then(response => {
           this.results = response.data 
           this.curPageCount = this.results.length 
@@ -165,7 +167,7 @@ export default {
 
 
       axios
-        .get('http://localhost:8080/resultsCount?filterColumn=runId&filterValue=' + this.runId)
+        .get(this.ApiUrl + '/resultsCount?filterColumn=runId&filterValue=' + this.runId)
         .then(response => {
           this.rowCount = response.data
           this.maxPages = Math.ceil(this.rowCount / this.perPage)

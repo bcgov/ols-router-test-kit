@@ -4,44 +4,49 @@
     <div class="p-1 fw-bold border-bottom mb-2">Custom Tests</div>
     <div>Table Description: A list of custom test definitions. Each test has specific routing parameters associated with it. Typically used for known edge-cases and other feature specific test cases.</div>
     <div> &nbsp</div>
-    <div> Displaying Rows {{ ((pageNum-1) * perPage) }} to {{ ((pageNum-1) * perPage) + curPageCount }} out of {{rowCount}} rows:</div>
+    <div> Displaying Rows {{ ((pageNum-1) * perPage) +1}} to {{ ((pageNum-1) * perPage) + curPageCount }} out of {{rowCount}} rows:</div>
     <table class="table table-striped table-sm">
       <tbody>
         <tr>
         <th class="thLink" @click="setSortBy('testId')"> Test ID 
           <template v-if="(this.sortBy === 'testId' && this.descending )">
-              &gt;
+              ▼
           </template>
           <template v-if="(this.sortBy === 'testId' && !this.descending )">
-              &lt;
+              ▲
           </template>
         </th>
-        <th class="thLink" @click="setSortBy('description')"> Description 
+        <th class="thLink" @click="setSortBy('description')"> Description
           <template v-if="(this.sortBy === 'description' && this.descending )">
-              &gt;
+              ▼
           </template>
           <template v-if="(this.sortBy === 'description' && !this.descending )">
-              &lt;
+              ▲
           </template>
         </th>
         <th> Criteria </th>
         <th> Enable </th>
         <th class="hideoverflowbigtd">Other Paramaters</th>
+        <th> Forward Ref? </th>
+        <th> Reverse Ref? </th>
       </tr>
       <tr v-for="test in tests">
         <td>
           <router-link :to="{name:'test',params:{testId:test.testId}}">{{ test.testId }} </router-link>
         </td>
         <td> {{ test.description}} </td>
-        <td>{{  test.parameters.criteria }}</td>
-        <td>{{  test.parameters.enable }}</td>
+        <td><p v-if="test.parameters?.criteria">{{ test.parameters.criteria }}</p></td>
+        <td><p v-if="test.parameters?.criteria">{{ test.parameters.enable }}</p></td>
         <td class="hideoverflowbigtd">
            
            <div class="hideoverflowtext" v-for="(param, name, i) in test.parameters">
               {{  name +":"+  param }}
            </div>
-          </td>
+        </td>
+        <td><p v-if="test.forwardResultId">Yes</p><p v-else>No</p></td>
+        <td><p v-if="test.reverseResultId">Yes</p><p v-else>No</p></td>
       </tr>
+      
     </tbody>
     </table>
     <table class="table-noborder">
@@ -61,8 +66,8 @@
 </template>
 
 <script>
-import axios from 'axios';import
-Shared from "../shared.js";
+import axios from 'axios';
+import Shared from "../shared.js";
 
 export default {
   extends: Shared,
@@ -77,17 +82,16 @@ export default {
   },
   methods: {
     updateTable(){
-      this.sortBy = "testId"
       var zeroBasePageNum = this.pageNum - 1
       axios
-        .get('http://localhost:8080/customTests?pageNumber=' + zeroBasePageNum + '&perPage=' + this.perPage + '&sortBy=' + this.sortBy + '&descending=' + this.descending)
+        .get(this.ApiUrl + '/customTests?pageNumber=' + zeroBasePageNum + '&perPage=' + this.perPage + '&sortBy=' + this.sortBy + '&descending=' + this.descending)
         .then(response => {
           this.tests = response.data
           this.curPageCount = this.tests.length 
         })
 
         axios
-        .get('http://localhost:8080/customTestsCount')
+        .get(this.ApiUrl + '/customTestsCount')
         .then(response => {
           this.rowCount = response.data
           this.maxPages = Math.ceil(this.rowCount / this.perPage)
@@ -96,6 +100,7 @@ export default {
     }
   },
   mounted(){
+    this.sortBy = "testId"
     this.updateTable()
   }
 }

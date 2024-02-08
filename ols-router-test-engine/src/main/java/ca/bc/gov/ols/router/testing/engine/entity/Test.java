@@ -1,6 +1,6 @@
 package ca.bc.gov.ols.router.testing.engine.entity;
 
-import java.time.LocalDate;
+import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -10,6 +10,9 @@ import java.util.Map;
 import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.type.SqlTypes;
 
+import com.fasterxml.jackson.annotation.JsonSetter;
+import com.fasterxml.jackson.annotation.JsonGetter;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -18,6 +21,7 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.SequenceGenerator;
 import jakarta.persistence.Table;
 
 
@@ -26,24 +30,25 @@ import jakarta.persistence.Table;
 public class Test{
 
 	@Id
-	@GeneratedValue(strategy = GenerationType.AUTO)
+	@SequenceGenerator(name="testIdentifier", sequenceName="tests_test_id_seq", allocationSize=1)
+	@GeneratedValue(strategy=GenerationType.SEQUENCE, generator="testIdentifier")
 	int testId;
 	
 	String description;
 	@Column(name="group_name")
 	String groupName;
-	@Column(name="fwd_ref_result_id")
+	@Column(name="result_id_fwd_ref")
 	Integer forwardResultId;
-	@Column(name="rev_ref_result_id")
+	@Column(name="result_id_rev_ref")
 	Integer reverseResultId;
 	String notes;
-	@Column(name="good_demo_case")
-	Boolean rungoodDemoCase;
+	@Column(name="good_demo_case_ind")
+	Boolean goodDemoCase;
 	String points;
 	@JdbcTypeCode(SqlTypes.JSON)
 	JsonNode parameters; 
-	@Column(name="created_date")
-	LocalDate createdDate;
+	@Column(name="created_timestamp")
+	ZonedDateTime createdTimestamp;
 	
 	
 	public Test() {}
@@ -58,7 +63,7 @@ public class Test{
 		this.forwardResultId = forwardResultId;
 		this.reverseResultId = reverseResultId;
 		this.notes = notes;
-		this.rungoodDemoCase = rungoodDemoCase;
+		this.goodDemoCase = rungoodDemoCase;
 		this.points = points;
 		this.parameters = parameters;
 	}
@@ -108,29 +113,24 @@ public class Test{
 		return reverseResultId;
 	}
 
-
 	public void setReverseResultId(Integer reverseResultId) {
 		this.reverseResultId = reverseResultId;
 	}
-
 
 	public String getNotes() {
 		return notes;
 	}
 
-
 	public void setNotes(String notes) {
 		this.notes = notes;
 	}
 
-
-	public Boolean getRungoodDemoCase() {
-		return rungoodDemoCase;
+	public Boolean getGoodDemoCase() {
+		return goodDemoCase;
 	}
 
-
-	public void setRungoodDemoCase(Boolean rungoodDemoCase) {
-		this.rungoodDemoCase = rungoodDemoCase;
+	public void setGoodDemoCase(Boolean goodDemoCase) {
+		this.goodDemoCase = goodDemoCase;
 	}
 
 
@@ -164,30 +164,34 @@ public class Test{
 		return parameters;
 	}
 
+	@JsonGetter("parameters")
 	public Map getParameterCopy() {
 		ObjectMapper mapper =new ObjectMapper();
 		Map<String, Object> map = mapper.convertValue(this.parameters, Map.class);
 		return map;
 	}
-	
+
+	@JsonSetter("parameters")
 	public void setParameters(Map parameters) {
 		ObjectMapper mapper = new ObjectMapper();
 		JsonNode jsonParameters =  mapper.convertValue(parameters, JsonNode.class);
 		this.parameters = jsonParameters;
 	}
+	
 	public void setParameters(JsonNode parameters) {
 		this.parameters = parameters;
 	}
 
 
-	public LocalDate getCreatedDate() {
-		return createdDate;
+	public ZonedDateTime getCreatedTimestamp() {
+		return createdTimestamp;
 	}
 
 
-	public void setCreatedDate(LocalDate createdDate) {
-		this.createdDate = createdDate;
+	public void setCreatedTimestamp(ZonedDateTime createdTimestamp) {
+		this.createdTimestamp = createdTimestamp;
 	}
+
 
 	
 

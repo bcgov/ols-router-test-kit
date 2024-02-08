@@ -1,12 +1,13 @@
 package ca.bc.gov.ols.router.testing.engine.entity;
 
-import java.time.LocalDate;
-import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
 import java.util.Map;
 
 import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.type.SqlTypes;
 
+import com.fasterxml.jackson.annotation.JsonGetter;
+import com.fasterxml.jackson.annotation.JsonSetter;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -38,37 +39,51 @@ public class Run{
 	Integer datasetId;
 	@Column(name="env_id")
 	Integer environmentId;
-	@Column(name="forward_route")
-	Boolean forwardRoute;
-	@Column(name="run_date")
-	LocalDate runDate;
+	@Column(name="forward_route_ind")
+	Boolean forwardRouteInd;
+	@Column(name="run_timestamp")
+	ZonedDateTime runTimestamp;
 	@Column(name="group_name")
 	String groupName;
 	
 	@JdbcTypeCode(SqlTypes.JSON)
 	JsonNode parameters;
 
-	@Column(name="queued_datetime")
-	LocalDateTime queuedDateTime;
+	@Column(name="queued_timestamp")
+	ZonedDateTime queuedTimestamp;
 	String status;
 	
 	
 	public Run() {}
 
 
-	public Run(int runId, String description, Integer datasetId, Integer environmentId, Boolean forwardRoute,
-			LocalDate runDate, String groupName, JsonNode parameters) {
+
+
+
+
+
+
+	public Run(int runId, String description, Integer datasetId, Integer environmentId, Boolean forwardRouteInd,
+			ZonedDateTime runTimestamp, String groupName, JsonNode parameters, ZonedDateTime queuedTimestamp,
+			String status) {
 		super();
 		this.runId = runId;
 		this.description = description;
 		this.datasetId = datasetId;
 		this.environmentId = environmentId;
-		this.forwardRoute = forwardRoute;
-
-		this.runDate = runDate;
+		this.forwardRouteInd = forwardRouteInd;
+		this.runTimestamp = runTimestamp;
 		this.groupName = groupName;
 		this.parameters = parameters;
+		this.queuedTimestamp = queuedTimestamp;
+		this.status = status;
 	}
+
+
+
+
+
+
 
 
 	public int getRunId() {
@@ -110,24 +125,13 @@ public class Run{
 		this.environmentId = environmentId;
 	}
 
-
-	public Boolean getForwardRoute() {
-		return forwardRoute;
+	public Boolean getForwardRouteInd() {
+		return forwardRouteInd;
 	}
 
 
-	public void setForwardRoute(Boolean forwardRoute) {
-		this.forwardRoute = forwardRoute;
-	}
-
-
-	public LocalDate getRunDate() {
-		return runDate;
-	}
-
-
-	public void setRunDate(LocalDate runDate) {
-		this.runDate = runDate;
+	public void setForwardRouteInd(Boolean forwardRouteInd) {
+		this.forwardRouteInd = forwardRouteInd;
 	}
 
 
@@ -145,31 +149,25 @@ public class Run{
 		return parameters;
 	}
 
+	@JsonGetter("parameters")
 	public Map getParameterCopy() {
 		ObjectMapper mapper =new ObjectMapper();
 		Map<String, Object> map = mapper.convertValue(this.parameters, Map.class);
 		return map;
 	}
 
+	
 	public void setParameters(JsonNode extraParameters) {
 		this.parameters = extraParameters;
 	}
 	
-	public void setParameters(Map extraParameters) {
+	@JsonSetter("parameters")
+	public void setParameters(Map parameters) {
 		ObjectMapper mapper = new ObjectMapper();
-		JsonNode jsonParameters =  mapper.convertValue(extraParameters, JsonNode.class);
+		JsonNode jsonParameters =  mapper.convertValue(parameters, JsonNode.class);
 		this.parameters = jsonParameters;
 	}
 	
-	public LocalDateTime getQueuedDateTime() {
-		return queuedDateTime;
-	}
-
-
-	public void setQueuedDate(LocalDateTime queuedDateTime) {
-		this.queuedDateTime = queuedDateTime;
-	}
-
 
 	public String getStatus() {
 		return status;
@@ -179,5 +177,27 @@ public class Run{
 	public void setStatus(String status) {
 		this.status = status;
 	}
+
+
+	public ZonedDateTime getRunTimestamp() {
+		return runTimestamp;
+	}
+
+
+	public void setRunTimestamp(ZonedDateTime runTimestamp) {
+		this.runTimestamp = runTimestamp;
+	}
+
+
+	public ZonedDateTime getQueuedTimestamp() {
+		return queuedTimestamp;
+	}
+
+
+	public void setQueuedTimestamp(ZonedDateTime queuedTimestamp) {
+		this.queuedTimestamp = queuedTimestamp;
+	}
+	
+	
 
 }

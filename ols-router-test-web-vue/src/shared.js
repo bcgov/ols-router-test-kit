@@ -1,3 +1,5 @@
+import axios from 'axios';
+
 export default {
     data(){
       return{perPage:10,
@@ -8,7 +10,12 @@ export default {
         rowCount:9999999,
         curPageCount:10,
         baseUrl:"http://office.refractions.net/~chodgson/gc/ols-demo/index.html",
-        defaultRt:"rri"
+        defaultRt:"rri",
+        datasets: [],
+        environments: [],
+        groupNameOptions: [],
+        codeVersions: [],
+        ApiUrl: "http://localhost:8080",
       }
     },
     methods: {
@@ -47,6 +54,44 @@ export default {
         },
         show2OnMap(resultId, resultId2){
           location.href = this.baseUrl + "?rt=" + this.defaultRt + "&test_results=" + resultId + "," + resultId2
-        }
+        },
+        formatDate(date){
+          return new Date(date);
+        },      
+        fetchGroupNames(){
+          axios
+          .get(this.ApiUrl + '/groupNameOptions')
+          .then(response => {
+            this.results = response.data
+            response.data.forEach(item => {
+              var option = { value: item.groupName, label: item.groupName }
+              this.groupNameOptions.push(option)
+            });
+  
+            var allOption = { value: 'All', label: 'All' }
+            this.groupNameOptions.push(allOption)
+          })
+        },        
+        fetchEnvironments() {
+          axios
+          .get(this.ApiUrl + '/environments')
+          .then(response => {
+            this.environments = response.data
+            });
+        },
+        fetchDatasets() {
+          axios
+          .get(this.ApiUrl + '/datasets')
+          .then(response => {
+            this.datasets = response.data
+            });
+        },
+        fetchCodes() {
+          axios
+          .get(this.ApiUrl + '/codeVersions')
+          .then(response => {
+            this.codeVersions = response.data
+            });
+        },
     }
   };

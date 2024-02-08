@@ -5,7 +5,7 @@
     <div>Table Description: A list of completed test runs. Each run shows the date, number of tests, parameters used etc. To compare 2 runs against each other, select the radio button in column "Comp A" on one row, then the radio button in"Comp B" for the 2nd row you wish to compare. Then press the "Compare" button just below this text.</div>
     <div><button  @click="compareHandler"> Compare</button></div>
     <div> &nbsp</div>
-    <div> Displaying Rows {{ ((pageNum-1) * perPage) }} to {{ ((pageNum-1) * perPage) + curPageCount }} out of {{rowCount}} rows:</div>
+    <div> Displaying Rows {{ ((pageNum-1) * perPage) +1 }} to {{ ((pageNum-1) * perPage) + curPageCount }} out of {{rowCount}} rows:</div>
     <table class="table table-striped table-sm">
       <tbody>
         <tr>
@@ -13,66 +13,74 @@
         <th>Comp&nbspB</th>
         <th class="thLink" @click="setSortBy('runId')"> Run ID 
           <template v-if="(sortBy === 'runId' && descending )">
-              &gt;
+              ▼
           </template>
           <template v-if="(sortBy === 'runId' && !descending )">
-              &lt;
+            ▲
           </template>
         </th>
-        <th class="thLink" @click="setSortBy('runDate')"> Date 
-          <template v-if="(sortBy === 'runDate' && descending )">
-              &gt;
+        <th class="thLink" @click="setSortBy('status')"> Status 
+          <template v-if="(sortBy === 'status' && descending )">
+            ▼
           </template>
-          <template v-if="(sortBy === 'runDate' && !descending )">
-              &lt;
+          <template v-if="(sortBy === 'status' && !descending )">
+            ▲
+          </template>
+        </th>
+        <th class="thLink" @click="setSortBy('runTimestamp')"> Run Timestamp 
+          <template v-if="(sortBy === 'runTimestamp' && descending )">
+              ▼
+          </template>
+          <template v-if="(sortBy === 'runTimestamp' && !descending )">
+              ▲
           </template>
         </th>
         <th class="thLink" @click="setSortBy('groupName')"> Group Name 
           <template v-if="(sortBy === 'groupName' && descending )">
-              &gt;
+              ▼
           </template>
           <template v-if="(sortBy === 'groupName' && !descending )">
-              &lt;
+              ▲
           </template>
         </th>
         <th class="thLink" @click="setSortBy('testCount')"># Tests
           <template v-if="(sortBy === 'testCount' && descending )">
-              &gt;
+              ▼
           </template>
           <template v-if="(sortBy === 'testCount' && !descending )">
-              &lt;
+              ▲
           </template>
         </th>
         <th class="thLink" @click="setSortBy('description')">Run Description
           <template v-if="(sortBy === 'description' && descending )">
-              &gt;
+              ▼
           </template>
           <template v-if="(sortBy === 'description' && !descending )">
-              &lt;
+              ▲
           </template>
         </th>
         <th class="thLink" @click="setSortBy('environment')">Environment
           <template v-if="(sortBy === 'environment' && descending )">
-              &gt;
+              ▼
           </template>
           <template v-if="(sortBy === 'environment' && !descending )">
-              &lt;
+              ▲
           </template>
         </th>
         <th class="thLink" @click="setSortBy('dataset')">Dataset
           <template v-if="(sortBy === 'dataset' && descending )">
-              &gt;
+              ▼
           </template>
           <template v-if="(sortBy === 'dataset' && !descending )">
-              &lt;
+              ▲
           </template>
         </th>
-        <th class="thLink" @click="setSortBy('forwardRoute')">Dir
-          <template v-if="(sortBy === 'forwardRoute' && descending )">
-              &gt;
+        <th class="thLink" @click="setSortBy('forwardRouteInd')">Dir
+          <template v-if="(sortBy === 'forwardRouteInd' && descending )">
+              ▼
           </template>
-          <template v-if="(sortBy === 'forwardRoute' && !descending )">
-              &lt;
+          <template v-if="(sortBy === 'forwardRouteInd' && !descending )">
+              ▲
           </template>
         </th>
         <th>Criteria</th>
@@ -81,17 +89,24 @@
         <th>Vs Reference Route</th>
       </tr>
       <tr v-for="run in runs">
-        <td class="centered"><input name='compareA' v-model="compareA" type='radio' :value="run.runId"></td>
-        <td class="centered"><input name='compareB' v-model="compareB" type='radio' :value="run.runId"></td>
+        <template v-if="(run.status === 'complete')">
+          <td class="centered"><input name='compareA' v-model="compareA" type='radio' :value="run.runId"></td>
+          <td class="centered"><input name='compareB' v-model="compareB" type='radio' :value="run.runId"></td>
+        </template>
+        <template v-else>
+          <td></td>
+          <td></td>
+        </template>
         <td class="thLink centered"> 
           <router-link :to="{name:'run',params:{runId:run.runId}}">{{ run.runId }}</router-link></td>
-        <td>{{ run.runDate }}</td>
+        <td :class="run.status === 'failed' ? 'red-text':'' ">{{ run.status }}</td>
+        <td>{{ formatDate(run.runTimestamp) }}</td>
         <td>{{ run.groupName }}</td>
-        <td class="centered">{{ run.testCount }}</td>
+        <td class="right">{{ run.testCount }}</td>
         <td>{{ run.description }}</td>
         <td>{{ run.environment   }}</td>
         <td> {{ run.dataset }} </td>
-        <td class="centered" v-if="run.forwardRoute"> F </td>
+        <td class="centered" v-if="run.forwardRouteInd"> F </td>
         <td class="centered" v-else> T </td>
         <td>{{  run.parameters.criteria }}</td>
         <td>{{  run.parameters.enable }}</td>
@@ -102,7 +117,12 @@
             </template>
            </div>
         </td>
-        <td class="centered"><button @click="referenceHandler(run.runId)">Vs Reference</button></td>
+        <template v-if="(run.status === 'complete')">
+          <td class="centered"><button @click="referenceHandler(run.runId)">Vs Reference</button></td>
+        </template>
+        <template v-else>
+          <td></td>
+        </template>
       </tr>
     </tbody>
     </table>
@@ -137,6 +157,16 @@ export default {
         runs:null,
         compareA:null,
         compareB:null,
+        options: {
+            year: 'numeric',
+            month: 'long',
+            day: 'numeric',
+            hour: 'numeric',
+            minute: 'numeric',
+            second: 'numeric',
+            timeZoneName: 'short',
+        },
+
     }
 
   },
@@ -146,14 +176,14 @@ export default {
     updateTable(){
       var zeroBasePageNum = this.pageNum - 1
       axios
-        .get('http://localhost:8080/runs?pageNumber=' + zeroBasePageNum + '&perPage=' + this.perPage + '&sortBy=' + this.sortBy + '&descending=' + this.descending)
+        .get(this.ApiUrl + '/runs?pageNumber=' + zeroBasePageNum + '&perPage=' + this.perPage + '&sortBy=' + this.sortBy + '&descending=' + this.descending)
         .then(response => {
           this.runs = response.data
           this.curPageCount = this.runs.length 
         })
 
         axios
-        .get('http://localhost:8080/runsCount')
+        .get(this.ApiUrl + '/runsCount')
         .then(response => {
           this.rowCount = response.data
           this.maxPages = Math.ceil(this.rowCount / this.perPage)

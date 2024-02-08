@@ -7,7 +7,7 @@ import java.io.InputStreamReader;
 import java.io.UnsupportedEncodingException;
 import java.net.HttpURLConnection;
 import java.net.URL;
-import java.time.LocalDate;
+import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -90,7 +90,8 @@ public class RouterTestingEngine {
 			saveResults = false;
 		}
 
-		List<Run> runList = runRepository.findByStatusOrderByQueuedDateTime("queued");
+		List<Run> runList = runRepository.findByStatusOrderByQueuedTimestamp("queued");
+		int totalCount = runList.size();
 		int count = 0;
 		List<Result> results = null;
 
@@ -119,16 +120,22 @@ public class RouterTestingEngine {
 			System.out.println("Running RunID: " + run.getRunId() + " which entails: " + list.size() + " tests.");
 			results = runTests(saveResults, list, run);
 
-			run.setStatus("complete");
-			run.setRunDate(LocalDate.now());
-			runRepository.save(run);
-			count++;
+			if(results != null) {
+			
+				run.setStatus("complete");
+				run.setRunTimestamp(ZonedDateTime.now());
+				runRepository.save(run);
+				count++;
+			}else {
+				run.setStatus("failed");
+				runRepository.save(run);
+			}
 		}
-		System.out.println(count + " total runs found and completed.");
+		System.out.println(count + " / " +  totalCount + " runs completed successfully.");
 	}
 
 	private static List<Result> runTests(Boolean saveResults, List<Test> list, Run run) {
-
+		
 		HashMap<String, String> envParameters = getEnvParameters(run.getEnvironmentId());
 		envParameters.put("saveResults", saveResults.toString());
 
@@ -148,7 +155,7 @@ public class RouterTestingEngine {
 			testId = test.getTestId();
 			if ("Custom".equals(test.getGroupName())) {// Custom tests, use the test-specific parameters
 				parameters = test.getParameterCopy();
-				if (!run.getForwardRoute()) {
+				if (!run.getForwardRouteInd()) {
 					parameters.put("points", test.getPointsReversed().replace(' ', ','));
 				} else {
 					parameters.put("points", test.getPoints().replace(' ', ','));
@@ -156,7 +163,7 @@ public class RouterTestingEngine {
 
 			} else { // non-Custom tests, use the default parameters from the overall 'run'
 				parameters = run.getParameterCopy();
-				if (!run.getForwardRoute()) {
+				if (!run.getForwardRouteInd()) {
 					parameters.put("points", test.getPointsReversed().replace(' ', ','));
 				} else {
 					parameters.put("points", test.getPoints().replace(' ', ','));
@@ -272,17 +279,22 @@ public class RouterTestingEngine {
 		Geometry route = new GeometryFactory().createLineString(pointArray);
 
 		Result result = new Result(runId, testId, (double) attributes.get("executionTime"),
-				(double) attributes.get("distance"), route, (double) attributes.get("time"), partitionSignature,
+				(double) attributes.get("distance")*1000, route, (double) attributes.get("time"), partitionSignature,
 				partitionIndices);
 
 		return result;
 
 	}
 
-	private static HashMap<String, String> getEnvParameters(Integer envId) {
-		Environment env = environmentRepository.findById(envId).get();
+	private static HashMap<String, String> getEnvParameters(Integer envId){
 
 		HashMap<String, String> envParameters = new HashMap<String, String>();
+		
+		if (envId == null) {
+		return envParameters;
+		}
+		Environment env = environmentRepository.findById(envId).get();
+
 
 		envParameters.put("baseurl", env.getBaseApiUrl() + "directions.json?");
 		envParameters.put("truckurl", env.getBaseApiUrl() + "truck/directions.json?");

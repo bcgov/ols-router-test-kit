@@ -11,37 +11,37 @@
           <th class="rightborder"></th>
           <th colspan="4" class="thLink rightborder" @click="setSortBy('distance_diff')"> Distance(m)
             <template v-if="(this.sortBy === 'distance_diff' && this.descending )">
-                &gt;
+                ▼
             </template>
             <template v-if="(this.sortBy === 'distance_diff' && !this.descending )">
-                &lt;
+                ▲
             </template>
           </th>
 
           <th colspan="4" class="thLink rightborder" @click="setSortBy('duration_diff')"> Duration(s)
             <template v-if="(this.sortBy === 'duration_diff' && this.descending )">
-                &gt;
+                ▼
             </template>
             <template v-if="(this.sortBy === 'duration_diff' && !this.descending )">
-                &lt;
+                ▲
             </template>
           </th>
           
           <th colspan="4" class="thLink rightborder" @click="setSortBy('calc_time_diff')"> Calc Time (ms)
             <template v-if="(this.sortBy === 'calc_time_diff' && this.descending )">
-                &gt;
+                ▼
             </template>
             <template v-if="(this.sortBy === 'calc_time_diff' && !this.descending )">
-                &lt;
+                ▲
             </template>
           </th>
 
           <th colspan="3" class="thLink rightborder" @click="setSortBy('partition_diff')"> Partition Sig
             <template v-if="(this.sortBy === 'partition_diff' && this.descending )">
-                &gt;
+                ▼
             </template>
             <template v-if="(this.sortBy === 'partition_diff' && !this.descending )">
-                &lt;
+                ▲
             </template>
           </th>
           <th></th>
@@ -51,10 +51,10 @@
         <tr>
           <th class="thLink rightborder" @click="setSortBy('a_test_id')"> Test ID  
             <template v-if="(this.sortBy === 'a_test_id' && this.descending )">
-                &gt;
+                ▼
             </template>
             <template v-if="(this.sortBy === 'a_test_id' && !this.descending )">
-                &lt;
+                ▲
             </template>
           </th>
 
@@ -62,18 +62,18 @@
           <th> {{ this.runIdB }}</th>
           <th class="thLink" @click="setSortBy('distance_diff')"> Diff
             <template v-if="(this.sortBy === 'distance_diff' && this.descending )">
-                &gt;
+                ▼
             </template>
             <template v-if="(this.sortBy === 'distance_diff' && !this.descending )">
-                &lt;
+                ▲
             </template>
           </th>
           <th class="thLink rightborder" @click="setSortBy('distance_perc')"> Diff %
             <template v-if="(this.sortBy === 'distance_perc' && this.descending )">
-                &gt;
+                ▼
             </template>
             <template v-if="(this.sortBy === 'distance_perc' && !this.descending )">
-                &lt;
+                ▲
             </template>
           </th>
 
@@ -81,18 +81,18 @@
           <th> {{ this.runIdB }}</th>
           <th class="thLink" @click="setSortBy('distance_diff')"> Diff
             <template v-if="(this.sortBy === 'duration_diff' && this.descending )">
-                &gt;
+                ▼
             </template>
             <template v-if="(this.sortBy === 'duration_diff' && !this.descending )">
-                &lt;
+                ▲
             </template>
           </th>
           <th class="thLink rightborder" @click="setSortBy('duration_perc')"> Diff %
             <template v-if="(this.sortBy === 'duration_perc' && this.descending )">
-                &gt;
+                ▼
             </template>
             <template v-if="(this.sortBy === 'duration_perc' && !this.descending )">
-                &lt;
+                ▲
             </template>
           </th>
 
@@ -100,18 +100,18 @@
           <th> {{ this.runIdB }}</th>
           <th class="thLink" @click="setSortBy('calc_time_diff')"> Diff
             <template v-if="(this.sortBy === 'calc_time_diff' && this.descending )">
-                &gt;
+                ▼
             </template>
             <template v-if="(this.sortBy === 'calc_time_diff' && !this.descending )">
-                &lt;
+                ▲
             </template>
           </th>
           <th class="thLink rightborder" @click="setSortBy('calc_time_perc')"> Diff %
             <template v-if="(this.sortBy === 'calc_time_perc' && this.descending )">
-                &gt;
+                ▼
             </template>
             <template v-if="(this.sortBy === 'calc_time_perc' && !this.descending )">
-                &lt;
+                ▲
             </template>
           </th>
 
@@ -121,10 +121,10 @@
 
           <th class="thLink" @click="setSortBy('description')"> Description
             <template v-if="(this.sortBy === 'description' && this.descending )">
-                &gt;
+                ▼
             </template>
             <template v-if="(this.sortBy === 'description' && !this.descending )">
-                &lt;
+                ▲
             </template>
           </th>
           <th> Notes</th>
@@ -132,26 +132,26 @@
         </tr>
 
         <tr v-for="result in results" >  
-            <td class="rightborder"> <router-link :to="{name:'test',params:{testId:result.a_test_id}}">{{ result.a_test_id }} </router-link> </td>
+            <td class="rightborder centered"> <router-link :to="{name:'test',params:{testId:result.a_test_id}}">{{ result.a_test_id }} </router-link> </td>
 
-            <td> {{ result.a_distance.toFixed(0)}} </td>
-            <td> {{ result.b_distance.toFixed(0) }}</td>
-            <td> {{ result.distance_diff.toFixed(0)  }}</td>
-            <td class="rightborder"> {{ result.distance_perc.toFixed(0) }} </td>
+            <td class="right"> {{ result.a_distance.toFixed(0)}} </td>
+            <td class="right"> {{ result.b_distance.toFixed(0) }}</td>
+            <td class="right"> {{ result.distance_diff.toFixed(0)  }}</td>
+            <td class="rightborder right"> {{ result.distance_perc.toFixed(0) }} </td>
 
-            <td> {{ result.a_duration.toFixed(0)}} </td>
-            <td> {{ result.b_duration.toFixed(0) }}</td>
-            <td> {{ result.duration_diff.toFixed(0)  }}</td>
-            <td class="rightborder"> {{ result.duration_perc.toFixed(0) }} </td>
+            <td class="right"> {{ result.a_duration.toFixed(0)}} </td>
+            <td class="right"> {{ result.b_duration.toFixed(0) }}</td>
+            <td class="right"> {{ result.duration_diff.toFixed(0)  }}</td>
+            <td class="rightborder right"> {{ result.duration_perc.toFixed(0) }} </td>
 
-            <td> {{ result.a_calc_time}} </td>
-            <td> {{ result.b_calc_time }}</td>
-            <td> {{ result.calc_time_diff.toFixed(0)  }}</td>
-            <td class="rightborder"> {{ result.calc_time_perc.toFixed(0) }} </td>
+            <td class="right"> {{ result.a_calc_time}} </td>
+            <td class="right"> {{ result.b_calc_time }}</td>
+            <td class="right"> {{ result.calc_time_diff.toFixed(0)  }}</td>
+            <td class="rightborder right"> {{ result.calc_time_perc.toFixed(0) }} </td>
 
-            <td> {{ result.a_partition_signature}} </td>
-            <td> {{ result.b_partition_signature}}</td>
-            <td class="rightborder"> {{ result.partition_diff  }}</td>
+            <td class="right"> {{ result.a_partition_signature}} </td>
+            <td class="right"> {{ result.b_partition_signature}}</td>
+            <td class="rightborder right"> {{ result.partition_diff  }}</td>
 
             <td> {{ result.description}} </td>
             <td> {{ result.notes}}</td>
@@ -200,14 +200,14 @@ export default {
     updateTable(){
       var zeroBasePageNum = this.pageNum - 1
       axios
-        .get('http://localhost:8080/compareRuns?runIdA=' + this.runIdA + '&runIdB=' + this.runIdB + '&pageNumber=' + zeroBasePageNum + '&perPage=' + this.perPage + '&sortBy=' + this.sortBy + '&descending=' + this.descending)
+        .get(this.ApiUrl + '/compareRuns?runIdA=' + this.runIdA + '&runIdB=' + this.runIdB + '&pageNumber=' + zeroBasePageNum + '&perPage=' + this.perPage + '&sortBy=' + this.sortBy + '&descending=' + this.descending)
         .then(response =>{
           this.results = response.data
           this.curPageCount = this.results.length 
         })
 
       axios
-        .get('http://localhost:8080/compareRunsCount?runIdA=' + this.runIdA + '&runIdB=' + this.runIdB )
+        .get(this.ApiUrl + '/compareRunsCount?runIdA=' + this.runIdA + '&runIdB=' + this.runIdB )
         .then(response =>{
           this.rowCount = response.data
           this.maxPages = Math.ceil(this.rowCount / this.perPage)

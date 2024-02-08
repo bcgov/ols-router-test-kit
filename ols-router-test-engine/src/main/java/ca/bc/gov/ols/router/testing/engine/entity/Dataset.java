@@ -1,10 +1,13 @@
 package ca.bc.gov.ols.router.testing.engine.entity;
 
+import java.time.ZonedDateTime;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.SequenceGenerator;
 import jakarta.persistence.Table;
 
 @Entity
@@ -12,25 +15,26 @@ import jakarta.persistence.Table;
 public class Dataset{
 
 	@Id
-	@GeneratedValue(strategy = GenerationType.AUTO)
+	@SequenceGenerator(name="datasetidentifier", sequenceName="datasets_dataset_id_seq", allocationSize=1)
+	@GeneratedValue(strategy=GenerationType.SEQUENCE, generator="datasetidentifier")
 	int datasetId;
 	
-	@Column(name="is_bc_subset")
-	Boolean isBcSubset;
+	@Column(name="bc_subset_ind")
+	Boolean isBcSubsetInd;
 	@Column(name="road_source")
 	String roadSource;
-	@Column(name="road_vintage")
-	String roadVintage;
+	@Column(name="road_network_timestamp")
+	ZonedDateTime roadNetworkTimestamp;
 	String description;
 	
 	public Dataset() {}
 	
-	public Dataset(int datasetId, Boolean isBcSubset, String roadSource, String roadVintage, String description) {
+	public Dataset(int datasetId, Boolean isBcSubsetInd, String roadSource, ZonedDateTime roadNetworkTimestamp, String description) {
 		super();
 		this.datasetId = datasetId;
-		this.isBcSubset = isBcSubset;
+		this.isBcSubsetInd = isBcSubsetInd;
 		this.roadSource = roadSource;
-		this.roadVintage = roadVintage;
+		this.roadNetworkTimestamp = roadNetworkTimestamp;
 		this.description = description;
 	}
 	public int getDatasetId() {
@@ -39,11 +43,11 @@ public class Dataset{
 	public void setDatasetId(int datasetId) {
 		this.datasetId = datasetId;
 	}
-	public Boolean getIsBcSubset() {
-		return isBcSubset;
+	public Boolean getIsBcSubsetInd() {
+		return isBcSubsetInd;
 	}
-	public void setIsBcSubset(Boolean isBcSubset) {
-		this.isBcSubset = isBcSubset;
+	public void setIsBcSubsetInd(Boolean isBcSubsetInd) {
+		this.isBcSubsetInd = isBcSubsetInd;
 	}
 	public String getRoadSource() {
 		return roadSource;
@@ -51,12 +55,15 @@ public class Dataset{
 	public void setRoadSource(String roadSource) {
 		this.roadSource = roadSource;
 	}
-	public String getRoadVintage() {
-		return roadVintage;
+	
+	public ZonedDateTime getRoadNetworkTimestamp() {
+		return roadNetworkTimestamp;
 	}
-	public void setRoadVintage(String roadVintage) {
-		this.roadVintage = roadVintage;
+
+	public void setRoadNetworkTimestamp(ZonedDateTime roadNetworkTimestamp) {
+		this.roadNetworkTimestamp = roadNetworkTimestamp;
 	}
+
 	public String getDescription() {
 		return description;
 	}

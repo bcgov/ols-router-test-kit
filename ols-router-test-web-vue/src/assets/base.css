@@ -140,6 +140,14 @@ td{
 .centered{
   text-align: center
 }
+.right{
+  text-align: right
+}
+
+.red-text{
+  color: red
+}
+
 .centeredtable{
   margin-left: auto;
   margin-right: auto;
@@ -219,7 +227,15 @@ a:visited {
   z-index: 1;
 }
 
-/* Show the tooltip text when you mouse over the tooltip container */
-.tooltip:hover .tooltiptext {
-  visibility: visible;
+.errortext{
+  color: #f99;
+  float: right;
+}
+
+.headerColour{
+  background-color: var(--color-header);
+}
+
+.smallText{
+  font-size: 0.75em;
 }

@@ -8,6 +8,9 @@ import Test from './views/Test.vue'
 import Run from './views/Run.vue'
 import CompareRuns from './views/CompareRuns.vue'
 import CompareToRefs from './views/CompareToRefs.vue'
+import CreateNew from './views/CreateNew.vue'
+import CreateRun from './views/CreateRun.vue'
+import List from './views/List.vue'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -55,8 +58,23 @@ const router = createRouter({
       name: 'compareToRefs',
       props: (route) => ({ runId: Number(route.params.runId) }),
       component: CompareToRefs
-    }
-
+    },
+    {
+      path: '/createNew/',
+      name: 'createNew',
+      component: CreateNew
+    },
+    {
+      path: '/createRun/',
+      name: 'createRun',
+      component: CreateRun
+    },
+    {
+      path: '/list/:objectName',
+      name: 'list',
+      props: (route) => ({ objectName: String(route.params.objectName) }),
+      component: List
+    },
   ]
 })
 
