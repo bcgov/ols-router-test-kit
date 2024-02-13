@@ -116,4 +116,4 @@ export default {
 
 <style scoped>
 
-</style>../shared.js
+</style>
