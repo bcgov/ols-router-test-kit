@@ -6,4 +6,4 @@ CREATE USER ols_router_test_kit_owner WITH PASSWORD 'secret1';
 CREATE USER ols_router_test_kit_app WITH PASSWORD 'secret2';
 
 
-CREATE DATABASE ols_router_test_kit2 WITH OWNER ols_router_test_kit_owner;
+CREATE DATABASE ols_router_test_kit WITH OWNER ols_router_test_kit_owner;
