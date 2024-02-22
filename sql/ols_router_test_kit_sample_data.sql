@@ -17,7 +17,7 @@ SET client_min_messages = warning;
 SET row_security = off;
 
 --
--- Data for Name: code_versions; Type: TABLE DATA; Schema: public; Owner: router
+-- Data for Name: code_versions; Type: TABLE DATA; Schema: public; Owner: -
 --
 
 COPY public.code_versions (code_id, code_base, github_commit_id, version_num, description) FROM stdin;
@@ -96,7 +96,7 @@ COPY public.code_versions (code_id, code_base, github_commit_id, version_num, de
 
 
 --
--- Data for Name: datasets; Type: TABLE DATA; Schema: public; Owner: router
+-- Data for Name: datasets; Type: TABLE DATA; Schema: public; Owner: -
 --
 
 COPY public.datasets (dataset_id, bc_subset_ind, road_source, road_network_timestamp, description) FROM stdin;
@@ -197,7 +197,7 @@ COPY public.datasets (dataset_id, bc_subset_ind, road_source, road_network_times
 
 
 --
--- Data for Name: environments; Type: TABLE DATA; Schema: public; Owner: router
+-- Data for Name: environments; Type: TABLE DATA; Schema: public; Owner: -
 --
 
 COPY public.environments (env_id, platform, environment, base_api_url, api_key) FROM stdin;
@@ -214,7 +214,7 @@ COPY public.environments (env_id, platform, environment, base_api_url, api_key) 
 
 
 --
--- Data for Name: runs; Type: TABLE DATA; Schema: public; Owner: router
+-- Data for Name: runs; Type: TABLE DATA; Schema: public; Owner: -
 --
 
 COPY public.runs (run_id, description, dataset_id, code_id, forward_route_ind, run_timestamp, group_name, env_id, parameters, queued_timestamp, status) FROM stdin;
@@ -225,7 +225,7 @@ COPY public.runs (run_id, description, dataset_id, code_id, forward_route_ind, r
 
 
 --
--- Data for Name: tests; Type: TABLE DATA; Schema: public; Owner: router
+-- Data for Name: tests; Type: TABLE DATA; Schema: public; Owner: -
 --
 
 COPY public.tests (test_id, description, group_name, result_id_fwd_ref, result_id_rev_ref, notes, good_demo_case_ind, points, parameters, created_timestamp) FROM stdin;
@@ -368,7 +368,7 @@ COPY public.tests (test_id, description, group_name, result_id_fwd_ref, result_i
 
 
 --
--- Data for Name: results; Type: TABLE DATA; Schema: public; Owner: router
+-- Data for Name: results; Type: TABLE DATA; Schema: public; Owner: -
 --
 
 COPY public.results (result_id, run_id, test_id, calc_time, distance, route_geometry, duration, partition_signature, partition_indices, partition_lengths) FROM stdin;
@@ -638,7 +638,7 @@ COPY public.results (result_id, run_id, test_id, calc_time, distance, route_geom
 
 
 --
--- Data for Name: spatial_ref_sys; Type: TABLE DATA; Schema: public; Owner: postgres
+-- Data for Name: spatial_ref_sys; Type: TABLE DATA; Schema: public; Owner: -
 --
 
 COPY public.spatial_ref_sys (srid, auth_name, auth_srid, srtext, proj4text) FROM stdin;
@@ -646,42 +646,42 @@ COPY public.spatial_ref_sys (srid, auth_name, auth_srid, srtext, proj4text) FROM
 
 
 --
--- Name: code_versions_code_id_seq; Type: SEQUENCE SET; Schema: public; Owner: router
+-- Name: code_versions_code_id_seq; Type: SEQUENCE SET; Schema: public; Owner: -
 --
 
 SELECT pg_catalog.setval('public.code_versions_code_id_seq', 75, true);
 
 
 --
--- Name: datasets_dataset_id_seq; Type: SEQUENCE SET; Schema: public; Owner: router
+-- Name: datasets_dataset_id_seq; Type: SEQUENCE SET; Schema: public; Owner: -
 --
 
 SELECT pg_catalog.setval('public.datasets_dataset_id_seq', 96, true);
 
 
 --
--- Name: environments_env_id_seq; Type: SEQUENCE SET; Schema: public; Owner: router
+-- Name: environments_env_id_seq; Type: SEQUENCE SET; Schema: public; Owner: -
 --
 
 SELECT pg_catalog.setval('public.environments_env_id_seq', 9, true);
 
 
 --
--- Name: results_result_id_seq; Type: SEQUENCE SET; Schema: public; Owner: router
+-- Name: results_result_id_seq; Type: SEQUENCE SET; Schema: public; Owner: -
 --
 
 SELECT pg_catalog.setval('public.results_result_id_seq', 2246010, true);
 
 
 --
--- Name: runs_run_id_seq; Type: SEQUENCE SET; Schema: public; Owner: router
+-- Name: runs_run_id_seq; Type: SEQUENCE SET; Schema: public; Owner: -
 --
 
 SELECT pg_catalog.setval('public.runs_run_id_seq', 584, true);
 
 
 --
--- Name: tests_test_id_seq; Type: SEQUENCE SET; Schema: public; Owner: router
+-- Name: tests_test_id_seq; Type: SEQUENCE SET; Schema: public; Owner: -
 --
 
 SELECT pg_catalog.setval('public.tests_test_id_seq', 25061, true);
