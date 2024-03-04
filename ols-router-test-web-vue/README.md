@@ -25,6 +25,9 @@ npm install
 
 ### Compile and Hot-Reload for Development
 
+Vite requires node 14 or above to run.
+
+
 ```sh
 npm run dev
 ```
