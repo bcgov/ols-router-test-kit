@@ -89,49 +89,75 @@ public class RouterTestingEngine {
 		if ("false".equalsIgnoreCase(System.getenv("OLS-ROUTER-SAVE-RESULTS"))) {
 			saveResults = false;
 		}
+		
+		// check the system variables for the desired frequency to check for new test run requests
+		int runEveryXSec;
+		String valueStr= System.getenv("OLS-ROUTER-RUN-EVERY-X-SEC");
+		if (valueStr == null || valueStr.isBlank()) {
+			runEveryXSec = 30;//use default
+	    } else {
+	        // Convert the value to an integer
+	        try {
+	            runEveryXSec  = Integer.parseInt(valueStr);
+	        } catch (NumberFormatException e) {
+	        	runEveryXSec = 30;//use default
+	        }
+	    }
 
-		List<Run> runList = runRepository.findByStatusOrderByQueuedTimestamp("queued");
-		int totalCount = runList.size();
-		int count = 0;
-		List<Result> results = null;
-
-		for (Run run : runList) {
-
-			// double check the status in case it has changed while running previous tests
-			// etc, end the process if it has changed.
-			Run latestRun = runRepository.findById(run.getRunId()).get();
-			if (!"queued".contentEquals(latestRun.getStatus())) {
-				System.out.println("RunID: " + run.getRunId()
-						+ " was no longer in status 'queued' when we attempted to run it. A different server processed it or a user changed the status unexpectantly. Ending the current Engine's test runs.");
-				return;
+		
+		//Infinite Loop to keep checking for new test run results:
+		while (true) {
+		
+			List<Run> runList = runRepository.findByStatusOrderByQueuedTimestamp("queued");
+			int totalCount = runList.size();
+			int count = 0;
+			List<Result> results = null;
+	
+			for (Run run : runList) {
+	
+				// double check the status in case it has changed while running previous tests
+				// etc, end the process if it has changed.
+				Run latestRun = runRepository.findById(run.getRunId()).get();
+				if (!"queued".contentEquals(latestRun.getStatus())) {
+					System.out.println("RunID: " + run.getRunId()
+							+ " was no longer in status 'queued' when we attempted to run it. A different server processed it or a user changed the status unexpectantly. Ending the current Engine's test runs.");
+					return;
+				}
+	
+				run.setStatus("inprogress");
+				runRepository.save(run);
+	
+				String groupName = run.getGroupName();
+	
+				ArrayList<Test> list = new ArrayList<Test>();
+				if ("ALL".equals(groupName)) {
+					list = (ArrayList<Test>) testRepository.findAll();
+				} else {
+					list = (ArrayList<Test>) testRepository.findAllByGroupName(groupName);
+				}
+				System.out.println("Running RunID: " + run.getRunId() + " which entails: " + list.size() + " tests.");
+				results = runTests(saveResults, list, run);
+	
+				if(results != null) {
+				
+					run.setStatus("complete");
+					run.setRunTimestamp(ZonedDateTime.now());
+					runRepository.save(run);
+					count++;
+				}else {
+					run.setStatus("failed");
+					runRepository.save(run);
+				}
 			}
-
-			run.setStatus("inprogress");
-			runRepository.save(run);
-
-			String groupName = run.getGroupName();
-
-			ArrayList<Test> list = new ArrayList<Test>();
-			if ("ALL".equals(groupName)) {
-				list = (ArrayList<Test>) testRepository.findAll();
-			} else {
-				list = (ArrayList<Test>) testRepository.findAllByGroupName(groupName);
-			}
-			System.out.println("Running RunID: " + run.getRunId() + " which entails: " + list.size() + " tests.");
-			results = runTests(saveResults, list, run);
-
-			if(results != null) {
+			System.out.println(count + " / " +  totalCount + " runs completed successfully.");
 			
-				run.setStatus("complete");
-				run.setRunTimestamp(ZonedDateTime.now());
-				runRepository.save(run);
-				count++;
-			}else {
-				run.setStatus("failed");
-				runRepository.save(run);
-			}
+			// Sleep for runEveryXSec seconds
+            try {
+                Thread.sleep(runEveryXSec * 1000); // 30 seconds in milliseconds
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
 		}
-		System.out.println(count + " / " +  totalCount + " runs completed successfully.");
 	}
 
 	private static List<Result> runTests(Boolean saveResults, List<Test> list, Run run) {
