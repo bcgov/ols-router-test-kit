@@ -9,13 +9,13 @@ export default {
         sortBy:"",
         rowCount:9999999,
         curPageCount:10,
-        baseUrl:"http://office.refractions.net/~chodgson/gc/ols-demo/index.html",
+        baseUrl:"https://ols-route-test-dev.apps.gov.bc.ca",
         defaultRt:"rri",
         datasets: [],
         environments: [],
         groupNameOptions: [],
         codeVersions: [],
-        ApiUrl: "http://localhost:8080",
+        ApiUrl: "https://ols-route-test-dev.apps.gov.bc.ca/api",
       }
     },
     methods: {
