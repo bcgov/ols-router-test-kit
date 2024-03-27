@@ -1,5 +1,5 @@
 # ols-router-test-engine
-The springboot application which runs router tests. Currently (feb14, 2024) when the application is run, it checks the router test database for any "Runs" that have a status of "queued", and runs all the associated tests for those runs then stops. If the application needs to be setup to periodically run, it could be done with various outside tools to schedule this application, or done within the app itself by adding an infinite while loop and some wait period etc.
+The springboot application which runs router tests. It checks the router test database for any "Runs" that have a status of "queued", and runs all the associated tests for those runs then stops. See the OLS-ROUTER-RUN-EVERY-X-SEC description below to configure how long to wait before checking for more queued run requests.
 
 The main() function is in:
 package ca.bc.gov.ols.router.testing.engine;
@@ -13,3 +13,6 @@ spring.datasource.password
 
 Optional environment variable:
 OLS-ROUTER-SAVE-RESULTS - This can be set to "false" if you wish to run all the test but not save the results in the database, which can be useful for testing without affecting any production/real test data. Typically one wants to save the results, so if you don't provide this the default is always "true".
+
+
+OLS-ROUTER-RUN-EVERY-X-SEC - This can be set to an integer. This is the time, in seconds, the engine will pause after each check of the database for queued test runs, beforing checking for more requests to run additional tests. Default if not given is 30 seconds.
