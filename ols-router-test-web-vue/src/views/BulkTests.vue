@@ -2,7 +2,7 @@
   <main class="container">
     
     <div class="p-1 fw-bold border-bottom mb-2">Bulk Tests </div>
-    <div>Table Description: A large set of simple test without specific routing parameters. Each test is a simple a start and end point, meant to provide a large coverage of routing areas and possible use cases.</div>
+    <div>Table Description: A large set of simple tests without specific routing parameters. Each test is a simple a start and end point, meant to provide a large coverage of routing areas and possible use cases.</div>
     <div> &nbsp</div>
     <div> Displaying Rows {{ ((pageNum-1) * perPage)+1 }} to {{ ((pageNum-1) * perPage) + curPageCount }} out of {{rowCount}} rows:</div>
     <table class="table table-striped table-sm">
