@@ -9,7 +9,7 @@
 
       <tr>
         <td>Group Name:</td>
-        <td>{{ run.groupname }}</td>
+        <td>{{ run.groupName }}</td>
       </tr>
 
       <tr>
@@ -29,7 +29,9 @@
 
       <tr>
         <td>Direction:</td>
-        <td>{{ run.forwardRoute }}</td>
+        <td><p v-if=run.forwardRouteInd > Forward</p>
+            <p v-else> Backward</p>
+        </td>
       </tr>
 
       <tr v-for="(p, name, i) in run.parameters"  >

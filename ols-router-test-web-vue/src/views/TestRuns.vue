@@ -106,8 +106,8 @@
         <td>{{ run.description }}</td>
         <td>{{ run.environment   }}</td>
         <td> {{ run.dataset }} </td>
-        <td class="centered" v-if="run.forwardRouteInd"> F </td>
-        <td class="centered" v-else> T </td>
+        <td class="centered" v-if="run.forwardRouteInd"> Foward </td>
+        <td class="centered" v-else> Backward </td>
         <td>{{  run.parameters.criteria }}</td>
         <td>{{  run.parameters.enable }}</td>
         <td  class="hideoverflowtd">
