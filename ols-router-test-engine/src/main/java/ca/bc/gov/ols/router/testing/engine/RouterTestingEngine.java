@@ -179,6 +179,7 @@ public class RouterTestingEngine {
 				count = 0;
 			}
 			testId = test.getTestId();
+			
 			if ("Custom".equals(test.getGroupName())) {// Custom tests, use the test-specific parameters
 				parameters = test.getParameterCopy();
 				if (!run.getForwardRouteInd()) {
@@ -233,11 +234,13 @@ public class RouterTestingEngine {
 				// as well with this 'else' logic
 			baseUrl = envParameters.get("baseurl");
 		}
-
+		
 		URL url = new URL(baseUrl);
 		HttpURLConnection con = (HttpURLConnection) url.openConnection();
 		con.setRequestMethod("POST");
 		// con.setRequestMethod("GET");
+		
+		con.setRequestProperty("apikey", envParameters.get("apikey"));
 
 		con.setDoOutput(true);
 		con.setRequestProperty("User-Agent", USER_AGENT);
@@ -250,8 +253,7 @@ public class RouterTestingEngine {
 		out.flush();
 		out.close();
 
-		// System.out.println("testing URL: " +
-		// ParameterStringBuilder.getParamsString(parameters));
+		//System.out.println("Inside singletest testing URL: " + ParameterStringBuilder.getParamsString(parameters));
 
 		BufferedReader in = new BufferedReader(new InputStreamReader(con.getInputStream()));
 		String inputLine;
@@ -324,6 +326,7 @@ public class RouterTestingEngine {
 
 		envParameters.put("baseurl", env.getBaseApiUrl() + "directions.json?");
 		envParameters.put("truckurl", env.getBaseApiUrl() + "truck/directions.json?");
+		envParameters.put("apikey", env.getApiKey());
 
 		return envParameters;
 	}
