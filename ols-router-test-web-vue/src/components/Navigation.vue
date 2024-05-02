@@ -1,6 +1,6 @@
 <template>
     <div id="menuBar">
-      <div>RouterNG Testing Framework</div>
+      <div><RouterLink :to="{name:'runs'}" class="homelink">RouterNG Testing Framework</RouterLink></div>
       <div id="tabs">
         <div><RouterLink :to="{name:'runs'}">Runs</RouterLink></div>
         <div><RouterLink :to="{name:'bulkTests'}">Bulk Tests</RouterLink></div>
@@ -70,4 +70,11 @@ export default {}
   color: var(--color-text-link);
   font-weight: bold;
 }
+
+.homelink {
+  text-decoration: none;
+}
+
+
+
 </style>

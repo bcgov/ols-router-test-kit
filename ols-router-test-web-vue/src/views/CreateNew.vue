@@ -55,7 +55,9 @@
     <table class="table table-striped">
       <!-- Create Environment Form -->
       <tr>
-        <td colspan="2" class="headerColour"><h2>Create a New Environment</h2> <router-link :to="{name:'list',params:{objectName:'environments'}}"> (View existing Environments)</router-link></td>
+        <td colspan="2" class="headerColour"><h2>Create a New Environment</h2> 
+          (The exact URL and API Key provided here will be used to send test requests)<br>
+          <router-link :to="{name:'list',params:{objectName:'environments'}}"> (View existing Environments)</router-link></td>
       </tr>
       <tr>
         <td><label for="platform">Platform:</label></td>
@@ -70,7 +72,7 @@
           Cannot be blank.</div></td>
       </tr>
       <tr>
-        <td><label for="baseApiUrl">Base API URL:</label></td>
+        <td><label for="baseApiUrl">Base API URL:</label> </td>
         <td><input v-model="environmentData.baseApiUrl" type="text" size="50" required />
         <div class="errortext" v-if="!isValidUrl(environmentData.baseApiUrl) && envDirty">
           Please enter a valid URL format for the Base API URL.
@@ -93,7 +95,9 @@
       <table class="table table-striped">
       <!-- Create Dataset Form -->
       <tr>
-        <td colspan="2" class="headerColour"><h2>Create a New Dataset</h2> <router-link :to="{name:'list',params:{objectName:'datasets'}}"> (View existing Datasets)</router-link></td>
+        <td colspan="2" class="headerColour"><h2>Create a New Dataset</h2>
+          (These values are not used to select a router or dataset version to send requests to, they are only for reference)<br>
+          <router-link :to="{name:'list',params:{objectName:'datasets'}}"> (View existing Datasets)</router-link></td>
       </tr>
       <tr>
         <td><label for="isBcSubsetInd">Is BC Subset:</label></td>
@@ -135,7 +139,9 @@
   <form @submit.prevent="createCodeVersion">
   <table class="table table-striped">
       <tr>
-        <td colspan="2" class="headerColour"><h2>Create a New Code Version</h2><router-link :to="{name:'list',params:{objectName:'codeVersions'}}"> (View existing Code Versions)</router-link></td>
+        <td colspan="2" class="headerColour"><h2>Create a New Code Version</h2>
+          (These values are not used to select a router or code version to send requests to, they are only for reference)<br>
+          <router-link :to="{name:'list',params:{objectName:'codeVersions'}}"> (View existing Code Versions)</router-link></td>
       </tr>
       <tbody>
         <tr>
