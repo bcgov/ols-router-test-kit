@@ -1,10 +1,19 @@
 package ca.bc.gov.ols.router.testing.web.controllers;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Optional;
+import java.util.stream.Stream;
 
+import org.geolatte.geom.C2D;
+import org.geolatte.geom.Feature;
+import org.geolatte.geom.Geometry;
+import org.geolatte.geom.json.GeoJsonFeature;
+import org.geolatte.geom.json.GeoJsonFeatureCollection;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
@@ -52,25 +61,22 @@ public class ApiController {
 				EnvironmentRepository environmentRepository,
 				DatasetRepository datasetRepository,
 				CodeVersionRepository codeVersionRepository) {
-		
 		this.resultRepository = resultRepository;
 		this.testRepository = testRepository;
 		this.runRepository = runRepository;
 		this.environmentRepository = environmentRepository;
 		this.datasetRepository=  datasetRepository;
 		this.codeVersionRepository = codeVersionRepository;
-		
-		
 	}
 
-	/* Returns a paged, sorted list of Result entities from the DB in Json format
+	/**
+	 * Returns a paged, sorted list of Result entities from the DB in Json format
 	 * @param PageNumber - the page number of data you are requesting 
 	 * @param perPage - results you want perPage
 	 * @param sortBy - the name of the column to sort by, e.g. resultId 
 	 * @param <optional> filterColumn - the name of the column to filter: runId or testId is supported so far 
 	 * @param <optional> filterValue - the integer value to filter on
 	*/
-	
 	@RequestMapping("/results")
 	@JsonView(View.Default.class)
 	//above JsonView line means we don't send the geom, it's big and not necessary for this call, remove that line and all fields are sent.
@@ -101,15 +107,14 @@ public class ApiController {
 		
 	}
 	
-	
-	/* Returns a paged, sorted list of Result entities from the DB in Json format
+	/**
+	 * Returns a paged, sorted list of Result entities from the DB in Json format
 	 * @param PageNumber - the page number of data you are requesting 
 	 * @param perPage - results you want perPage
 	 * @param sortBy - the name of the column to sort by, e.g. resultId 
 	 * @param <optional> filterColumn - the name of the column to filter: runId or testId is supported so far 
 	 * @param <optional> filterValue - the integer value to filter on
 	*/
-	
 	@RequestMapping("/resultListForTest")
 	@JsonView(View.Default.class)
 	public List<Map>getResultListForTest(@RequestParam int testId, @RequestParam(defaultValue = "0")int pageNumber, @RequestParam(defaultValue = "10") int perPage, @RequestParam(defaultValue = "runId") String sortBy, @RequestParam Optional<Boolean> descending, @RequestParam Optional<String> filterColumn, @RequestParam Optional<Integer> filterValue) {
@@ -126,13 +131,9 @@ public class ApiController {
 		}catch (Exception e){
 			throw new InvalidParameterException("Invalid parameter value given. " + e.getMessage());
 		}
-		
 	}
 	
-	
-	
-	
-	/*
+	/**
 	 * Returns a count of all bulk tests
 	 * Useful for calculating "last page" in pagination UI 
 	 * @param Optional<String> filterColumn - the column to filter on runId or testID is supported
@@ -152,14 +153,12 @@ public class ApiController {
 			throw new InvalidParameterException("Invalid parameter value given. " + e.getMessage());
 		}
 	}
-	
 
-	/*
+	/**
 	 * Returns a paged, sorted list of Bulk Test entities (group name != "custom" means they are bulk type) from the DB in Json format
 	 * @param PageNumber - the page number of data you are requesting 
 	 * @param perPage - results you want perPage
 	 * @param sortBy - the name of the column to sort by, e.g. testId 
-
 	 */
 	@RequestMapping("/bulkTests")
 	public List<Test> getSortedPagedTests(@RequestParam(defaultValue = "0") int pageNumber, @RequestParam(defaultValue = "10") int perPage, @RequestParam(defaultValue = "testId") String sortBy, @RequestParam Optional<Boolean> descending) {
@@ -181,7 +180,7 @@ public class ApiController {
 		}
 	}
 
-	/*
+	/**
 	 * Returns a count of all bulk tests
 	 * Useful for calculating "last page" in pagination UI 
 	 */
@@ -193,10 +192,8 @@ public class ApiController {
 			throw new InvalidParameterException("Invalid parameter value given. " + e.getMessage());
 		}
 	}
-	
-	
 
-	/*
+	/**
 	 * Returns a paged, sorted list of Bulk Test entities (group name != "custom" means they are bulk type) from the DB in Json format
 	 * @param PageNumber - the page number of data you are requesting 
 	 * @param perPage - results you want perPage
@@ -223,7 +220,7 @@ public class ApiController {
 		}
 	}
 
-	/*
+	/**
 	 * Returns a count of all bulk tests
 	 * Useful for calculating "last page" in pagination UI 
 	 */
@@ -236,7 +233,7 @@ public class ApiController {
 		}
 	}
 	
-	/*
+	/**
 	 * Returns a single test object
 	 * @parameter testId - the test id that you want  
 	 */
@@ -249,7 +246,7 @@ public class ApiController {
 		}
 	}
 	
-	/*
+	/**
 	 * Returns a paged, sorted list of Run entities from the DB in Json format
 	 * @param PageNumber - the page number of data you are requesting 
 	 * @param perPage - results you want perPage
@@ -273,7 +270,7 @@ public class ApiController {
 		}
 	}
 	
-	/*
+	/**
 	 * Returns a count of all runs
 	 * Useful for calculating "last page" in pagination UI 
 	 */
@@ -286,7 +283,7 @@ public class ApiController {
 		}
 	}
 	
-	/*
+	/**
 	 * Returns a single runs
 	 * @param runId - the id for the one you want  
 	 */
@@ -299,7 +296,7 @@ public class ApiController {
 		}
 	}
 	
-	/*
+	/**
 	 * Returns a single environment
 	 * @param envId - the id for the one you want  
 	 */
@@ -312,7 +309,7 @@ public class ApiController {
 		}
 	}
 	
-	 /*
+	/**
 	 * Returns All environments 
 	 */
 	@RequestMapping("/environments")
@@ -322,8 +319,7 @@ public class ApiController {
 		
 	}
 	
-	
-	/*
+	/**
 	 * Returns a single dataset
 	 * @param datasetId - the id for the one you want  
 	 */
@@ -336,8 +332,7 @@ public class ApiController {
 		}
 	}
 	
-	
-	/*
+	/**
 	 * Returns a comparison of result sets for 2 given run IDs 
 	 * @param runIdA - the id for the first run  
 	 * @param runIdB - the id for the second run
@@ -365,7 +360,7 @@ public class ApiController {
 		}
 	}
 	
-	/*
+	/**
 	 * Returns the count of rows for the comparison of 2 given run IDs 
 	 * @param runIdA - the id for the first run  
 	 * @param runIdB - the id for the second run
@@ -379,10 +374,8 @@ public class ApiController {
 			throw new InvalidParameterException("Invalid parameter value given. " + e.getMessage());
 		}
 	}
-	
-	
 
-	/*
+	/**
 	 * Returns a comparison of result sets for 2 given run IDs 
 	 * @param runIdA - the run id to compare against reference tests  
 	 * @param PageNumber - the page number of data you are requesting 
@@ -407,11 +400,9 @@ public class ApiController {
 		}
 	}
 	
-	
-	/*
+	/**
 	 * Returns the count of rows for the comparison of run vs Ref  
 	 * @param runId - the id for the first run  
-
 	 */
 	@RequestMapping("/compareRunVsRefCount")
 	public Integer getComparedRunCount(@RequestParam int runId) {
@@ -423,9 +414,10 @@ public class ApiController {
 		}
 	}
 	
-	/*
+	/**
 	 * Returns specific results from the database 
-	 * @param ids - a comma separated list of result_ids the users wants details on  	 */
+	 * @param ids - a comma separated list of result_ids the users wants details on
+  	 */
 	@RequestMapping("/getResults")
 	public List<Result> getResults(@RequestParam List<Integer> ids) {
 		List<Result> resultList = new ArrayList<Result>();
@@ -438,37 +430,76 @@ public class ApiController {
 		}
 		return resultList;
 	}
-	
-	/*
+
+	/**
+	 * Returns specific results from the database in geojson structure 
+	 * @param ids - a comma separated list of result_ids the users wants details on  	 
+	 */
+	@SuppressWarnings("unchecked")
+	@RequestMapping("/resultsGeoJson")
+	public GeoJsonFeatureCollection<C2D, Integer> getResultsGeoJson(@RequestParam List<Integer> ids) {
+		List<Feature<C2D, Integer>> features = new ArrayList<Feature<C2D, Integer>>();
+		
+		List<Map<String,Object>> results = resultRepository.getGeoJsonByIds(ids);
+		for(Map<String,Object> result : results){
+			HashMap<String,Object> props = new HashMap<String, Object>();
+			Geometry<C2D> g = null;
+			Integer id = null;
+			for(Entry<String, Object> entry : result.entrySet()) {
+				String key = entry.getKey();
+				Object value = entry.getValue();
+				if(key != null) {
+					switch(key) {
+					case "geometry":
+						g = (Geometry<C2D>)value;
+						break;
+					case "result_id":
+						id = (Integer)value;
+						// no break because we also add the id to the props
+					default:
+						if("partition_indices".equals(key)) {
+							if(value == null) {
+								value = Collections.emptyList();
+							} else {
+								value = Stream.of(((String)value).split("\\|")).map(s -> Integer.valueOf(s)).toArray(Integer[]::new);
+							}
+						}
+						props.put(key, value);
+					}
+				}
+			}
+			GeoJsonFeature<C2D, Integer> f = new GeoJsonFeature<C2D, Integer>(g, id, props);
+			
+			features.add(f);
+		}
+		
+		return new GeoJsonFeatureCollection<C2D, Integer>(features);
+	}
+
+	/**
 	 * Returns group Name options from the list of existing ones in the test table 
-	*/
+	 */
 	@RequestMapping("/groupNameOptions")
 	public List<Map> getGroupNameOptions() {
 		return testRepository.getGroupNameOptopns();
-		
 	}
 	
-	
-	/*
+	/**
 	 * Returns All code versions 
 	 */
 	@RequestMapping("/codeVersions")
 	public List<CodeVersion> getCodeVersion() {
 		return codeVersionRepository.findAllWithCustomSorting();
-		
 	}
 	
-	/*
+	/**
 	 * Returns All datasets 
 	 */
 	@RequestMapping("/datasets")
 	public List<Dataset> getdatasets() {
 		return datasetRepository.findAllWithCustomSorting();
-		
 	}
 
-	
-	
 	/*
 	 * Updates a testId with a new Forward Reference ID
 	 */
@@ -480,13 +511,11 @@ public class ApiController {
 			test.setForwardResultId(resultId);
 			testRepository.save(test);
 			return "Update Succeeded";
-		}else {
+		} else {
 			return "Update Failed"; 
 		}
 		
 	}
-	
-	
 	
 	@PostMapping("/createEnvironment")
     public Environment createEnvironment(@RequestBody Environment environment) {
@@ -513,7 +542,4 @@ public class ApiController {
         return codeVersionRepository.save(codeVersion);
     }
     
-    
-    
-   
 }

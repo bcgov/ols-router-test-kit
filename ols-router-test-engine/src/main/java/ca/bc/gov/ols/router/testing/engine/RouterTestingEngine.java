@@ -17,6 +17,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.Geometry;
 import org.locationtech.jts.geom.GeometryFactory;
+import org.locationtech.jts.geom.PrecisionModel;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
@@ -48,18 +49,14 @@ public class RouterTestingEngine {
 
 	private static final String USER_AGENT = "Mozilla/5.0";
 
-	@Autowired
-	public static ResultRepository resultRepository;
-	@Autowired
-	public static DatasetRepository datasetRepository;
-	@Autowired
-	public static EnvironmentRepository environmentRepository;
-	@Autowired
-	public static RunRepository runRepository;
-	@Autowired
-	public static TestRepository testRepository;
+	public static final GeometryFactory gf = new GeometryFactory(new PrecisionModel(), 4326);
 
-	@Autowired
+	public static ResultRepository resultRepository;
+	public static DatasetRepository datasetRepository;
+	public static EnvironmentRepository environmentRepository;
+	public static RunRepository runRepository;
+	public static TestRepository testRepository;
+	
 	public RouterTestingEngine(ResultRepository resultRepository, DatasetRepository datasetRepository,
 			EnvironmentRepository environmentRepository, RunRepository runRepository, TestRepository testRepository) {
 		// initialize all our database access repositories so we can easily query
@@ -304,7 +301,7 @@ public class RouterTestingEngine {
 			Coordinate c = new Coordinate((Double) point.get(0), (Double) point.get(1));
 			pointArray[i] = c;
 		}
-		Geometry route = new GeometryFactory().createLineString(pointArray);
+		Geometry route = gf.createLineString(pointArray);
 
 		Result result = new Result(runId, testId, (double) attributes.get("executionTime"),
 				(double) attributes.get("distance")*1000, route, (double) attributes.get("time"), partitionSignature,

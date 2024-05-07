@@ -50,10 +50,12 @@ export default {
             this.updateTable()
           },
         showOnMap(resultId){
-          location.href = this.baseUrl + "?rt=" + this.defaultRt + "&test_results=" + resultId
+          location.href = this.baseUrl + "?rt=" + this.defaultRt + "&test_results=" 
+              + encodeURIComponent(this.ApiUrl + "/resultsGeoJson?ids=" + resultId)
         },
         show2OnMap(resultId, resultId2){
-          location.href = this.baseUrl + "?rt=" + this.defaultRt + "&test_results=" + resultId + "," + resultId2
+          location.href = this.baseUrl + "?rt=" + this.defaultRt + "&test_results=" 
+              + encodeURIComponent(this.ApiUrl + "/resultsGeoJson?ids=" + resultId + "," + resultId2)
         },
         formatDate(date){
           return new Date(date);
