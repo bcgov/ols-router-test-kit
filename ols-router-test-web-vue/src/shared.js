@@ -9,13 +9,13 @@ export default {
         sortBy:"",
         rowCount:9999999,
         curPageCount:10,
-        baseUrl:"https://ols-route-test-dev.apps.gov.bc.ca",
+        baseUrl:"https://bcgov.github.io/ols-devkit/ols-demo/index.html",
         defaultRt:"rri",
         datasets: [],
         environments: [],
         groupNameOptions: [],
         codeVersions: [],
-        ApiUrl: "https://ols-route-test-dev.apps.gov.bc.ca/api",
+        ApiUrl: "https://ols-route-test-prod.apps.gov.bc.ca/api",
       }
     },
     methods: {
