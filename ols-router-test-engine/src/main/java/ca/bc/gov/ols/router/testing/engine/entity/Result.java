@@ -1,12 +1,12 @@
 package ca.bc.gov.ols.router.testing.engine.entity;
 
 import org.locationtech.jts.geom.Geometry;
+import org.n52.jackson.datatype.jts.GeometryDeserializer;
+import org.n52.jackson.datatype.jts.GeometrySerializer;
 
 import com.fasterxml.jackson.annotation.JsonView;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-import org.n52.jackson.datatype.jts.GeometrySerializer;
-import org.n52.jackson.datatype.jts.GeometryDeserializer;
 
 import jakarta.annotation.Nonnull;
 import jakarta.persistence.Column;

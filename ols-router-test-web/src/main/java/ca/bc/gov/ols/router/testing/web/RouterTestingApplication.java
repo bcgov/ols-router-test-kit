@@ -23,6 +23,6 @@ public class RouterTestingApplication {
 
 	@Bean
     Module GeolatteModule() {
-    	return new GeolatteGeomModule();
+		return new GeolatteGeomModule();
     }
 }

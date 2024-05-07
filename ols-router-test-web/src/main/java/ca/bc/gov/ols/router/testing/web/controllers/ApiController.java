@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Optional;
+import java.util.stream.Stream;
 
 import org.geolatte.geom.C2D;
 import org.geolatte.geom.Feature;
@@ -460,7 +461,7 @@ public class ApiController {
 							if(value == null) {
 								value = Collections.emptyList();
 							} else {
-								value = ((String)value).split("\\|");
+								value = Stream.of(((String)value).split("\\|")).map(s -> Integer.valueOf(s)).toArray(Integer[]::new);
 							}
 						}
 						props.put(key, value);
