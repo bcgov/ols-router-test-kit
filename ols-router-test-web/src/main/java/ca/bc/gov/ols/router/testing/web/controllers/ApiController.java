@@ -458,7 +458,7 @@ public class ApiController {
 						// no break because we also add the id to the props
 					default:
 						if("partition_indices".equals(key)) {
-							if(value == null) {
+							if(value == null || ((String)value).isEmpty()) {
 								value = Collections.emptyList();
 							} else {
 								value = Stream.of(((String)value).split("\\|")).map(s -> Integer.valueOf(s)).toArray(Integer[]::new);
