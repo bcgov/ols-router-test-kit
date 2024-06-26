@@ -97,10 +97,13 @@ public interface ResultRepository extends JpaRepository <Result, Integer> {
 	List<Map> getResultListForTest(@Param("testId") int testId, Pageable pageable);
 	
 	
-	@Query(value = "SELECT resultId as result_id, testId as test_id, runId as run_id, distance, duration, calcTime as calc_time, "
-			+ "    partitionSignature as partition_signature, partitionIndices as partition_indices, "
-			+ "    st_transform(routeGeometry,4326) as geometry "
-			+ "  FROM Result "
+	@Query(value = "SELECT r.resultId as result_id, r.testId as test_id, r.runId as run_id, "
+			+ "    distance as distance, duration as duration, r.calcTime as calc_time, "
+			+ "    r.partitionSignature as partition_signature, r.partitionIndices as partition_indices, "
+			+ "    st_transform(r.routeGeometry,4326) as geometry, "
+			+ "    t.points as points "
+			+ "  FROM Result r "
+			+ "  JOIN Test t ON r.testId = t.testId "
 			+ "  WHERE resultId IN ( :resultIds )")
 	List<Map<String,Object>> getGeoJsonByIds(@Param("resultIds") List<Integer> resultIds);
 	
