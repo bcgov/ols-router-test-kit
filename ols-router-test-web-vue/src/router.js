@@ -11,6 +11,7 @@ import CompareToRefs from './views/CompareToRefs.vue'
 import CreateNew from './views/CreateNew.vue'
 import CreateRun from './views/CreateRun.vue'
 import List from './views/List.vue'
+import MapView from './views/MapView.vue'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -74,6 +75,12 @@ const router = createRouter({
       name: 'list',
       props: (route) => ({ objectName: String(route.params.objectName) }),
       component: List
+    },
+    {
+      path: '/map/:resultId*',
+      name: 'map',
+      props: (route) => ({ resultId:route.params.resultId }),
+      component: MapView
     },
   ]
 })
