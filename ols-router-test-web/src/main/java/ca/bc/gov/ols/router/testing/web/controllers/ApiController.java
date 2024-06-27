@@ -1,5 +1,9 @@
 package ca.bc.gov.ols.router.testing.web.controllers;
 
+import static org.geolatte.geom.builder.DSL.g;
+import static org.geolatte.geom.builder.DSL.linestring;
+import static org.geolatte.geom.crs.CoordinateReferenceSystems.WGS84;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -9,8 +13,8 @@ import java.util.Map.Entry;
 import java.util.Optional;
 import java.util.stream.Stream;
 
-import org.geolatte.geom.C2D;
 import org.geolatte.geom.Feature;
+import org.geolatte.geom.G2D;
 import org.geolatte.geom.Geometry;
 import org.geolatte.geom.json.GeoJsonFeature;
 import org.geolatte.geom.json.GeoJsonFeatureCollection;
@@ -437,13 +441,14 @@ public class ApiController {
 	 */
 	@SuppressWarnings("unchecked")
 	@RequestMapping("/resultsGeoJson")
-	public GeoJsonFeatureCollection<C2D, Integer> getResultsGeoJson(@RequestParam List<Integer> ids) {
-		List<Feature<C2D, Integer>> features = new ArrayList<Feature<C2D, Integer>>();
+	public GeoJsonFeatureCollection<G2D, Integer> getResultsGeoJson(@RequestParam List<Integer> ids) {
+		List<Feature<G2D, Integer>> features = new ArrayList<Feature<G2D, Integer>>();
 		
 		List<Map<String,Object>> results = resultRepository.getGeoJsonByIds(ids);
 		for(Map<String,Object> result : results){
 			HashMap<String,Object> props = new HashMap<String, Object>();
-			Geometry<C2D> g = null;
+			Geometry<G2D> g = null;
+			String points = null;
 			Integer id = null;
 			for(Entry<String, Object> entry : result.entrySet()) {
 				String key = entry.getKey();
@@ -451,14 +456,17 @@ public class ApiController {
 				if(key != null) {
 					switch(key) {
 					case "geometry":
-						g = (Geometry<C2D>)value;
+						g = (Geometry<G2D>)value;
+						break;
+					case "points":
+						points = (String)value;
 						break;
 					case "result_id":
 						id = (Integer)value;
 						// no break because we also add the id to the props
 					default:
 						if("partition_indices".equals(key)) {
-							if(value == null) {
+							if(value == null || ((String)value).isEmpty()) {
 								value = Collections.emptyList();
 							} else {
 								value = Stream.of(((String)value).split("\\|")).map(s -> Integer.valueOf(s)).toArray(Integer[]::new);
@@ -468,12 +476,19 @@ public class ApiController {
 					}
 				}
 			}
-			GeoJsonFeature<C2D, Integer> f = new GeoJsonFeature<C2D, Integer>(g, id, props);
+			// if the route failed the geometry will be null
+			if((g == null || g.isEmpty()) && points != null && !points.isEmpty()) {
+				// we will replace with a simple 2-point line with the first and last points from the test case
+				String[] coords = points.replace(' ', ',').split(",");
+				g = linestring(WGS84, g(Double.valueOf(coords[0]), Double.valueOf(coords[1])), 
+						g(Double.valueOf(coords[coords.length-2]), Double.valueOf(coords[coords.length-1])));
+			}
+			GeoJsonFeature<G2D, Integer> f = new GeoJsonFeature<G2D, Integer>(g, id, props);
 			
 			features.add(f);
 		}
 		
-		return new GeoJsonFeatureCollection<C2D, Integer>(features);
+		return new GeoJsonFeatureCollection<G2D, Integer>(features);
 	}
 
 	/**

@@ -1,12 +1,6 @@
 <template>
-  <div id="pageWrap">
-    <Navigation/>
-    <div id="contentScroll">
-      <div id="content">
-        <router-view />
-      </div>
-    </div>
-  </div>
+  <Navigation/>
+  <div id="contentScroll"><router-view /></div>
 </template>
 
 <script setup>
@@ -23,10 +17,11 @@ import Navigation from './components/Navigation.vue'
 	height: 100%;
 }
 #contentScroll {
-	flex: 1 1 auto;
+	flex: 1;
 	overflow: auto;
 	margin: 0px;
 	background: var(--color-background);
 	padding: 0 20px 0 20px;
+	height: 100%;
 }
 </style>
