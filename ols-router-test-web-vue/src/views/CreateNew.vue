@@ -294,7 +294,7 @@ export default {
       axios.post(this.ApiUrl + '/createDataset', this.datasetData)
         .then(response => {
           console.log('Dataset created successfully:', response.data);
-          window.alert('Environment created successfully');
+          window.alert('Dataset created successfully');
         })
         .catch(error => {
           console.error('Error creating dataset:', error);
