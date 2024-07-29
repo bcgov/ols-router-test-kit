@@ -303,8 +303,12 @@ public class RouterTestingEngine {
 		}
 		Geometry route = gf.createLineString(pointArray);
 
+		double dis = (double)attributes.get("distance");
+		if (dis > 0){
+			dis = dis * 1000; //only convert to m if value is positive.
+		}
 		Result result = new Result(runId, testId, (double) attributes.get("executionTime"),
-				(double) attributes.get("distance")*1000, route, (double) attributes.get("time"), partitionSignature,
+				dis, route, (double) attributes.get("time"), partitionSignature,
 				partitionIndices);
 
 		return result;

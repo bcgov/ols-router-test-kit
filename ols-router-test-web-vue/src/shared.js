@@ -60,7 +60,12 @@ export default {
           //    + encodeURIComponent(this.ApiUrl + "/resultsGeoJson?ids=" + resultId + "," + resultId2)
         },
         formatDate(date){
-          return new Date(date);
+          if (date == null) {
+            return '';
+          } else {
+            return new Date(date);
+          }
+          
         },      
         fetchGroupNames(){
           axios
