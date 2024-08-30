@@ -30,26 +30,43 @@
               </td>
             </tr>
             <tr>
-              <td><label for="codeId">Code:</label><p class="smallText">(This doesn't select or change the code used in the test)</p></td>
-              <td>
-                <select v-model="run.codeId">
-                  <option v-for="code in codeVersions" :key="code.codeId" :value="code.codeId">{{ code.versionNum +" - " + code.description}}</option>
-                </select>
-                <div class="errortext" v-if="!run.codeId && dirty">Cannot be blank.</div>
-              </td>
-            </tr>
-            <tr>
-              <td><label for="datasetId">Dataset:</label><p class="smallText">(This doesn't select or change the dataset used in the test)</p></td>
-              <td>
-                <select v-model="run.datasetId">
-                  <option v-for="dataset in datasets" :key="dataset.datasetId" :value="dataset.datasetId">{{ dataset.roadSource + ' - ' + dataset.roadNetworkTimestamp }}</option>
-                </select>
-                <div class="errortext" v-if="!run.datasetId && dirty">Cannot be blank.</div>
-              </td>
-            </tr>
-            <tr>
               <td><label for="forwardRouteInd">Forward Route:</label></td>
               <td><input type="checkbox" v-model="run.forwardRouteInd"></td>
+            </tr>
+            <tr>
+              <td colspan="2">
+                <label>
+                  <input type="checkbox" v-model="autoDetect" />
+                  Automatically detect below values <br><span style="font-size: x-small;">(This is recommended unless you have a specific need to use values other than ones reported by the Environment above)</span>
+
+                </label>
+              </td>
+            </tr>
+            <tr>
+              <td>
+                <label for="codeId">Code:</label>
+                <p class="smallText">(This doesn't select or change the code used in the test)</p>
+              </td>
+              <td>
+                <select v-model="run.codeId" :disabled="autoDetect">
+                  <option v-for="code in codeVersions" :key="code.codeId" :value="code.codeId">
+                    {{ code.versionNum + " - " + code.description }}
+                  </option>
+                </select>
+              </td>
+            </tr>
+            <tr>
+              <td>
+                <label for="datasetId">Dataset:</label>
+                <p class="smallText">(This doesn't select or change the dataset used in the test)</p>
+              </td>
+              <td>
+                <select v-model="run.datasetId" :disabled="autoDetect">
+                  <option v-for="dataset in datasets" :key="dataset.datasetId" :value="dataset.datasetId">
+                    {{ dataset.roadSource + ' - ' + dataset.roadNetworkTimestamp }}
+                  </option>
+                </select>
+              </td>
             </tr>
 
             <tr v-if="run.groupName !== 'Custom'">
@@ -92,6 +109,7 @@
         testCaseUrl: 'https://office.refractions.net/~chodgson/gc/ols-demo/?rt=local&routeParams={"points":"-123,48,-123,48","criteria":"fastest","enable":"tr,xc,tc,"}',
         selectedFields: [],
         dirty: false,
+        autoDetect: true,
         datasets: [],
         environments: [],
         groupNameOptions: [],
@@ -115,10 +133,8 @@
     computed: {
       isFormValid(){
         return (
-          this.run.codeId &&
           this.run.environmentId &&
           this.run.groupName &&
-          this.run.datasetId &&
           this.isValidRouterUrl(this.testCaseUrl)
         );
       }
@@ -162,7 +178,8 @@
         this.run.parameters = { ...parsedRouteParams };
         delete this.run.parameters.points;
 
-  
+
+        
         console.log('Creating Dataset:', this.run);
         axios.post(this.ApiUrl + '/createRun', this.run)
             .then(response => {

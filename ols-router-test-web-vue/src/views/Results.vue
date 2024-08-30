@@ -112,7 +112,7 @@ export default {
   computed: {
   },
   methods: {
-    updateTable(){
+    runUpdateTable(){
       
       var zeroBasePageNum = this.pageNum - 1
       axios

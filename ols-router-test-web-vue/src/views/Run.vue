@@ -14,7 +14,7 @@
 
       <tr>
         <td>Run Timestamp:</td>
-        <td>{{ formatDate(run.runTimestamp) }}</td>
+        <td>{{ formatDate(run.runTimestamp) }}</td> 
       </tr>
 
       <tr>
@@ -132,7 +132,8 @@ export default {
       run:{},
       environment:{},
       dataset:{},
-      results:{}
+      results:{},
+      debounceTimeout: null,
     }
 
   },
@@ -157,7 +158,20 @@ export default {
           }
         })
     },
-    updateTable(){
+    updateTable() {
+      // Clear the previous timeout if it exists
+      if (this.debounceTimeout) {
+        clearTimeout(this.debounceTimeout);
+      }
+      console.log(shared.data().debouceTime); // Outputs: 700
+      // Set a new timeout
+      this.debounceTimeout = setTimeout(() => {
+        // Call the function to update the table
+        this.runUpdateTable();
+      }, Shared.data().debouceTime); // Adjust the delay in shared.js
+    },
+    
+    runUpdateTable(){
       
       var zeroBasePageNum = this.pageNum - 1
       axios

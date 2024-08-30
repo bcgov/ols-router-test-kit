@@ -1,10 +1,13 @@
-<template>
+  <template>
   <main class="container">
 
     <div class="p-1 fw-bold border-bottom mb-2">Compare Results for Run Ids: #{{ runIdA }} and #{{ runIdB }} </div>
     <div>Table Description: A list of all results that are associated to this Run Id. Click the "See on Map" button to review the calculated route. <p>The Partition Signature is encoded data describing how the route uses truck routes(1's) and non-truck routes(0's).  e.g. "010" means the route started as non-truck, went onto a truck route, then finished on a non-truck route.</p></div>
     <div> &nbsp</div>
     <div> Displaying Rows {{ ((pageNum-1) * perPage) }} to {{ ((pageNum-1) * perPage) + curPageCount }} out of {{rowCount}} rows:</div>
+
+    <div v-if="loading" class="loading-message" >Loading...</div>
+    <div v-else>
     <table class="table table-striped table-sm">
       <tbody>
         <tr>
@@ -16,6 +19,15 @@
             <template v-if="(this.sortBy === 'distance_diff' && !this.descending )">
                 ▲
             </template>
+          </th>
+          <th colspan="1" rowspan="2" class="thLink rightborder" @click="setSortBy('hausdorff_distance')"> Hausdorff
+            <template v-if="(this.sortBy === 'hausdorff_distance' && this.descending )">
+                ▼
+            </template>
+            <template v-if="(this.sortBy === 'hausdorff_distance' && !this.descending )">
+                ▲ 
+            </template>
+            <br>Distance(m)
           </th>
 
           <th colspan="4" class="thLink rightborder" @click="setSortBy('duration_diff')"> Duration(s)
@@ -79,7 +91,7 @@
 
           <th> {{ this.runIdA }}</th>
           <th> {{ this.runIdB }}</th>
-          <th class="thLink" @click="setSortBy('distance_diff')"> Diff
+          <th class="thLink" @click="setSortBy('duration_diff')"> Diff
             <template v-if="(this.sortBy === 'duration_diff' && this.descending )">
                 ▼
             </template>
@@ -134,20 +146,23 @@
         <tr v-for="result in results" >  
             <td class="rightborder centered"> <router-link :to="{name:'test',params:{testId:result.a_test_id}}">{{ result.a_test_id }} </router-link> </td>
 
-            <td class="right"> {{ result.a_distance.toFixed(0)}} </td>
-            <td class="right"> {{ result.b_distance.toFixed(0) }}</td>
-            <td class="right"> {{ result.distance_diff.toFixed(0)  }}</td>
-            <td class="rightborder right"> {{ result.distance_perc.toFixed(0) }} </td>
+            <td class="right"> {{ (result.a_distance ?? 0).toFixed(0)}} </td>
+            <td class="right"> {{ (result.b_distance ?? 0).toFixed(0) }}</td>
+            <td class="right"> {{ (result.distance_diff ?? 0).toFixed(0)  }}</td>
+            <td class="rightborder right"> {{ (result.distance_perc ?? 0).toFixed(0) }} </td>
 
-            <td class="right"> {{ result.a_duration.toFixed(0)}} </td>
-            <td class="right"> {{ result.b_duration.toFixed(0) }}</td>
-            <td class="right"> {{ result.duration_diff.toFixed(0)  }}</td>
-            <td class="rightborder right"> {{ result.duration_perc.toFixed(0) }} </td>
+            <td class="right"> {{ result.hausdorff_distance}} </td>
+
+            <td class="right"> {{ (result.a_duration ?? 0).toFixed(0)}} </td>
+            <td class="right"> {{ (result.b_duration ?? 0).toFixed(0) }}</td>
+            <td class="right"> {{ (result.duration_diff ?? 0).toFixed(0)  }}</td>
+            <td class="rightborder right"> {{ (result.duration_perc ?? 0).toFixed(0) }} </td>
 
             <td class="right"> {{ result.a_calc_time}} </td>
             <td class="right"> {{ result.b_calc_time }}</td>
-            <td class="right"> {{ result.calc_time_diff.toFixed(0)  }}</td>
-            <td class="rightborder right"> {{ result.calc_time_perc.toFixed(0) }} </td>
+            <td class="right"> {{ (result.calc_time_diff ?? 0).toFixed(0)
+  }}</td>
+            <td class="rightborder right"> {{ (result.calc_time_perc ?? 0).toFixed(0) }} </td>
 
             <td class="right"> {{ result.a_partition_signature}} </td>
             <td class="right"> {{ result.b_partition_signature}}</td>
@@ -173,6 +188,7 @@
         <td class="table-noborder">Jump To Page: <input type="text" size=2 @input="pageNumChanged" v-model="this.pageNum" /></td>
       </tr>
   </table>
+  </div>
   </main>
 </template>
 
@@ -191,20 +207,27 @@ export default {
       run:{},
       environment:{},
       dataset:{},
-      results:{}
+      results:{},
+      loading: false,
     }
 
   },
   computed: {},
   methods: {
-    updateTable(){
+    runUpdateTable(){
+      
+      this.loading = true; // show loading msg
       var zeroBasePageNum = this.pageNum - 1
       axios
         .get(this.ApiUrl + '/compareRuns?runIdA=' + this.runIdA + '&runIdB=' + this.runIdB + '&pageNumber=' + zeroBasePageNum + '&perPage=' + this.perPage + '&sortBy=' + this.sortBy + '&descending=' + this.descending)
         .then(response =>{
           this.results = response.data
           this.curPageCount = this.results.length 
-        })
+          this.loading = false; // hide loading msg
+      })
+      .catch(() => {
+        this.loading = false; // hide loading msg if there's an error
+      });
 
       axios
         .get(this.ApiUrl + '/compareRunsCount?runIdA=' + this.runIdA + '&runIdB=' + this.runIdB )

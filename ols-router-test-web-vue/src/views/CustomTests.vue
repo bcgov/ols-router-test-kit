@@ -81,7 +81,7 @@ export default {
   computed: {
   },
   methods: {
-    updateTable(){
+    runUpdateTable(){
       var zeroBasePageNum = this.pageNum - 1
       axios
         .get(this.ApiUrl + '/customTests?pageNumber=' + zeroBasePageNum + '&perPage=' + this.perPage + '&sortBy=' + this.sortBy + '&descending=' + this.descending)
