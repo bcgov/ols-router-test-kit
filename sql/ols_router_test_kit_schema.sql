@@ -257,19 +257,17 @@ ALTER SEQUENCE public.environments_env_id_seq OWNED BY public.environments.env_i
 --
 -- Name: results; Type: TABLE; Schema: public; Owner: -
 --
-
 CREATE TABLE public.results (
     result_id integer NOT NULL,
     run_id integer,
     test_id integer,
     calc_time real,
     distance real,
-    route_geometry public.geometry(Geometry,3005),
+    route_geometry public.geometry(Geometry, 3005),
     duration real,
-    partition_signature character varying(20),
-    partition_indices character varying(120),
-    partition_lengths character varying(300)
+    partition_info jsonb 
 );
+
 
 
 --
