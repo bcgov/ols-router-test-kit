@@ -24,6 +24,7 @@ CREATE EXTENSION IF NOT EXISTS postgis WITH SCHEMA public;
 
 -- Create the databse objects as the app owner user
 -- this needs to match the owner user previously created
+GRANT ALL ON SCHEMA public TO ols_router_test_kit_owner;
 SET ROLE ols_router_test_kit_owner;
 
 SET default_tablespace = '';
@@ -188,7 +189,8 @@ CREATE TABLE public.environments (
     platform character varying(50),
     environment character varying(50),
     base_api_url character varying(100),
-    api_key character varying(50)
+    api_key character varying(50),
+    usable_as_map_platform boolean
 );
 
 
@@ -265,9 +267,12 @@ CREATE TABLE public.results (
     distance real,
     route_geometry public.geometry(Geometry, 3005),
     duration real,
-    partition_info jsonb 
+    partition_info jsonb
+    --prior to test kit "phase2" changes ~Sept2024 we had these cols:
+    --partition_signature character varying(20),
+	--partition_indices character varying(120),
+	--partition_lengths character varying(300)
 );
-
 
 
 --

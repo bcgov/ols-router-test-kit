@@ -15,7 +15,7 @@ BEGIN
                 result := result || '1';
                 prev_value := '1';
             END IF;
-        ELSE
+        ELSIF item->>key_name = 'false' THEN
             -- Append '0' if the previous value was '1' or if the result is empty
             IF prev_value = '1' OR result = '' THEN
                 result := result || '0';
@@ -31,5 +31,5 @@ BEGIN
     
     RETURN result;
 END;
-$$ LANGUAGE plpgsql;
+$$ LANGUAGE plpgsql IMMUTABLE ;
 

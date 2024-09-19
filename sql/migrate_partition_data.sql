@@ -7,6 +7,12 @@
 -- successfully migrated to the new partition_info column before removing it during the column drops
 ALTER TABLE public.results ADD COLUMN partition_info JSONB;
 
+--setup a basic json object of the correct length in partition_info
+UPDATE your_table_name
+SET partition_info = (
+    SELECT jsonb_agg(jsonb_build_object('num', idx))
+    FROM generate_series(1, array_length(string_to_array(partition_indices, '|'), 1)) AS idx
+);
 
 --update the new column with the entire JSON object we want now
 WITH indexed_json AS (
@@ -24,7 +30,7 @@ WITH indexed_json AS (
             jsonb_array_elements(partition_info) AS elem,
             generate_series(1, jsonb_array_length(partition_info)) AS elem_index  -- Creates an index for each element
         FROM 
-            results
+            public.results
     ) subquery
 ),
 updated_data AS (

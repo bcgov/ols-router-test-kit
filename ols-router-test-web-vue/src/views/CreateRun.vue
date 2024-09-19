@@ -185,6 +185,7 @@
             .then(response => {
             console.log('New Run created successfully:', response.data);
             window.alert('New Run successfully queued');
+            this.$router.push({ name: 'runs' }); 
             })
             .catch(error => {
             console.error('Error creating Run:', error);

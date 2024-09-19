@@ -104,7 +104,7 @@ public interface ResultRepository extends JpaRepository <Result, Integer> {
 	
 	
 	//old partition parts of this: 			+ "    r.partitionSignature as partition_signature, r.partitionIndices as partition_indices, "
-	@Query(value = "SELECT r.resultId as result_id, r.testId as test_id, r.runId as run_id, "
+	@Query(value = "SELECT r.resultId as result_id, r.testId as test_id, r.runId as run_id, r.partitionInfo as partition_info, "
 			+ "    distance as distance, duration as duration, r.calcTime as calc_time, "
 			+ "    st_transform(r.routeGeometry,4326) as geometry, "
 			+ "    t.points as points "

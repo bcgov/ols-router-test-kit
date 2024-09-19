@@ -25,6 +25,8 @@ public class Environment{
 	String baseApiUrl;
 	@Column(name="api_key")
 	String apiKey;
+	@Column(name="usable_as_map_platform")
+	Boolean usableAsMapPlatform;
 	
 	public Environment() {}
 
@@ -76,6 +78,14 @@ public class Environment{
 
 	public void setApiKey(String apiKey) {
 		this.apiKey = apiKey;
+	}
+	
+	public Boolean getUsableAsMapPlatform() {
+		return usableAsMapPlatform;
+	}
+
+	public void setUsableAsMapPlatform(Boolean usableAsMapPlatform) {
+		this.usableAsMapPlatform = usableAsMapPlatform;
 	}
 
 }

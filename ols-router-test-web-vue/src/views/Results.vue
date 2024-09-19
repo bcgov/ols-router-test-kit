@@ -77,7 +77,7 @@
         <td class="right"> {{ Math.round(result.duration) }}</td>
         <td class="right"> {{ result.calcTime  }}</td>
         <td class="right"> {{ result.partitionSignature }} </td>
-        <td><button @click="showOnMap(result.resultId)">Show on Map (#{{ result.resultId}}) </button></td>
+        <td><button @click="aboutToshowOnMap(result.resultId, result.runId)">Show on Map (#{{ result.resultId}}) </button></td>
       </tr>
     </tbody>
     </table>
@@ -128,8 +128,23 @@ export default {
           this.rowCount = response.data
           this.maxPages = Math.ceil(this.rowCount / this.perPage)
         })
-
-
+    },
+    aboutToshowOnMap(resultId, runId){
+      axios
+        .get(this.ApiUrl + '/run?runId=' + runId)
+        .then(response => {
+          var run = response.data;
+          if (run.environmentId) {
+            axios
+              .get(this.ApiUrl + '/environment?envId=' + run.environmentId)
+              .then(response => {
+                var environment = response.data;
+                if (environment && resultId) {
+                  this.showOnMap(resultId, environment.platform);
+                }
+              });
+          }
+        });
     }
   },
   mounted(){
