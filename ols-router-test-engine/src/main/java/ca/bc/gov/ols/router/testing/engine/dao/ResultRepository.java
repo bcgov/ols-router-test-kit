@@ -44,6 +44,36 @@ public interface ResultRepository extends JpaRepository <Result, Integer> {
 		  + " WHERE a.runId = :runIdA AND b.runId = :runIdB")
 	List<Map> compareResultsOfRunIds(@Param("runIdA") Integer runIdA, @Param("runIdB") Integer runIdB, Pageable pageable);
 	
+	
+	/*
+	 * Query that gets all results for given run ID
+	 */
+	@Query(value ="SELECT r.runId as runId, r.forwardRouteInd as forwardRouteInd, "
+		    + "  re.resultId as resultId, re.calcTime as calcTime, re.distance as distance, re.duration as duration, "
+		    + " concat(e.platform, ' - ', e.environment) as environment, "
+		    + " concat(d.roadSource, ' ', d.roadNetworkTimestamp, ' - ', d.description) as dataset, "
+		    + " function('get_binary_partition_sig', re.partitionInfo ,'isTruckRoute') as partitionSignature"
+		    + " FROM Result re "
+		    + " JOIN Run r on re.runId = r.runId "
+		    + " LEFT JOIN Dataset d ON r.datasetId = d.datasetId "
+		    + " LEFT JOIN Environment e ON r.environmentId = e.environmentId "
+		  	+ " WHERE r.runId = :runId ")
+	List<Map> findByRunIdIsCustom(@Param("runId") Integer runId, Pageable pageable);
+	
+	/*
+	 * Query that gets all results for given test ID
+	 */
+	@Query(value ="SELECT r.runId as runId, r.forwardRouteInd as forwardRouteInd, "
+		    + "  re.resultId as resultId, re.calcTime as calcTime, re.distance as distance, re.duration as duration, "
+		    + " concat(e.platform, ' - ', e.environment) as environment, "
+		    + " concat(d.roadSource, ' ', d.roadNetworkTimestamp, ' - ', d.description) as dataset, "
+		    + " function('get_binary_partition_sig', re.partitionInfo ,'isTruckRoute') as partitionSignature"
+		    + " FROM Result re "
+		    + " JOIN Run r on re.runId = r.runId "
+		    + " LEFT JOIN Dataset d ON r.datasetId = d.datasetId "
+		    + " LEFT JOIN Environment e ON r.environmentId = e.environmentId "
+		  	+ " WHERE re.testId = :testId ")
+	List<Map> findByTestIdIsCustom(@Param("testId") Integer testId, Pageable pageable);
 
 
 	/*
@@ -93,8 +123,9 @@ public interface ResultRepository extends JpaRepository <Result, Integer> {
 	 */
 	@Query(value ="SELECT r.runId as runId, r.forwardRouteInd as forwardRouteInd, "
 		    + "  re.resultId as resultId, re.calcTime as calcTime, re.distance as distance, re.duration as duration, "
-		    + "  concat(e.platform, ' - ', e.environment) as environment, "
-		    + "  concat(d.roadSource, ' ', d.roadNetworkTimestamp, ' - ', d.description) as dataset "
+		    + " concat(e.platform, ' - ', e.environment) as environment, "
+		    + " concat(d.roadSource, ' ', d.roadNetworkTimestamp, ' - ', d.description) as dataset, "
+		    + " function('get_binary_partition_sig', re.partitionInfo ,'isTruckRoute') as partitionSignature"
 		    + " FROM Result re "
 		    + " JOIN Run r on re.runId = r.runId "
 		    + " LEFT JOIN Dataset d ON r.datasetId = d.datasetId "
@@ -113,5 +144,18 @@ public interface ResultRepository extends JpaRepository <Result, Integer> {
 			+ "  WHERE resultId IN ( :resultIds )")
 	List<Map<String,Object>> getGeoJsonByIds(@Param("resultIds") List<Integer> resultIds);
 	
+	
+	@Query(value = "SELECT r.runId as runId, r.forwardRouteInd as forwardRouteInd, "
+            + " re.resultId as resultId, re.calcTime as calcTime, re.distance as distance, re.duration as duration, "
+            + " concat(e.platform, ' - ', e.environment) as environment, "
+            + " concat(d.roadSource, ' ', d.roadNetworkTimestamp, ' - ', d.description) as dataset, "
+            + " function('get_binary_partition_sig', re.partitionInfo, 'isTruckRoute') as partitionSignature, "
+            + " re.testId as testId "
+            + " FROM Result re "
+            + " JOIN Run r on re.runId = r.runId "
+            + " LEFT JOIN Dataset d ON r.datasetId = d.datasetId "
+            + " LEFT JOIN Environment e ON r.environmentId = e.environmentId ")
+	List<Map> findAllCustom(Pageable pageable);
+
 	
 }

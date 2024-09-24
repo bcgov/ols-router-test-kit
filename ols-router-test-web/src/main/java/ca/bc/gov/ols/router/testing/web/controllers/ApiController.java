@@ -96,7 +96,7 @@ public class ApiController {
 	@JsonView(View.Default.class)
 	//above JsonView line means we don't send the geom, it's big and not necessary for this call, remove that line and all fields are sent.
 	//in the entity(Result) Class itself you can see the @JsonView things that define which fields are in which view
-	public List<Result>getSortedPagedResults(@RequestParam(defaultValue = "0")int pageNumber, @RequestParam(defaultValue = "10") int perPage, @RequestParam(defaultValue = "runId") String sortBy, @RequestParam Optional<Boolean> descending, @RequestParam Optional<String> filterColumn, @RequestParam Optional<Integer> filterValue) {
+	public List<Map>getSortedPagedResults(@RequestParam(defaultValue = "0")int pageNumber, @RequestParam(defaultValue = "10") int perPage, @RequestParam(defaultValue = "runId") String sortBy, @RequestParam Optional<Boolean> descending, @RequestParam Optional<String> filterColumn, @RequestParam Optional<Integer> filterValue) {
 		Direction order;
 		
 		if (descending.isPresent() && descending.get()==true) {
@@ -106,16 +106,15 @@ public class ApiController {
 		}
 		try {		
 			PageRequest pageReq = PageRequest.of(pageNumber, perPage, order, sortBy);
-			Page<Result> pageRes = null;
+			List<Map> pageRes = null;
 			if(!filterColumn.isEmpty() && "runId".equals(filterColumn.get())) {
-				pageRes = resultRepository.findByRunIdIs(filterValue.get(), pageReq);
+				pageRes = resultRepository.findByRunIdIsCustom(filterValue.get(), pageReq);
 			}else if(!filterColumn.isEmpty() && "testId".equals(filterColumn.get())) {
-				pageRes = resultRepository.findByTestIdIs(filterValue.get(), pageReq);
+				pageRes = resultRepository.findByTestIdIsCustom(filterValue.get(), pageReq);
 			}else {
-				pageRes = resultRepository.findAll(pageReq);
+				pageRes = resultRepository.findAllCustom(pageReq);
 			}
-			List<Result> list = pageRes.getContent();
-			return list;
+			return pageRes;
 		}catch (Exception e){
 			throw new InvalidParameterException("Invalid parameter value given. " + e.getMessage());
 		}
