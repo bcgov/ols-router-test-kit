@@ -8,7 +8,7 @@
 ALTER TABLE public.results ADD COLUMN partition_info JSONB;
 
 --setup a basic json object of the correct length in partition_info
-UPDATE your_table_name
+UPDATE results
 SET partition_info = (
     SELECT jsonb_agg(jsonb_build_object('num', idx))
     FROM generate_series(1, array_length(string_to_array(partition_indices, '|'), 1)) AS idx

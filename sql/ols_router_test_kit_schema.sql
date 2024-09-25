@@ -332,24 +332,31 @@ COMMENT ON COLUMN public.results.duration IS 'The travel time (in seconds) retur
 
 
 --
+-- Name: COLUMN results.partition_info; Type: COMMENT; Schema: public; Owner: -
+--
+
+COMMENT ON COLUMN public.results.partition_info IS 'The parition info is a set of json objects each with three key value pairs: index, distance and partition type/value. The index value represents the route node index where the partition starts.  The distance value is a measure of the length of the partition in kilometres. The partition key is a string label of the type, and its value represents the state or name of the partition.  Example: [{"index": "0", "distance": "", "isTruckRoute": false}, {"index": "28", "distance": "", "isTruckRoute": true}]';
+
+
+--
 -- Name: COLUMN results.partition_signature; Type: COMMENT; Schema: public; Owner: -
 --
 
-COMMENT ON COLUMN public.results.partition_signature IS 'Only for truck route tests (isTruckRoute partition), the signature is a sequence of alternating 1s and 0s that represents the alternating partitions of the route as it transitions between 1 (true, partition is a truck route) and 0 (false, partition is not a truck route), e.g., 010.';
+--COMMENT ON COLUMN public.results.partition_signature IS 'Only for truck route tests (isTruckRoute partition), the signature is a sequence of alternating 1s and 0s that represents the alternating partitions of the route as it transitions between 1 (true, partition is a truck route) and 0 (false, partition is not a truck route), e.g., 010.';
 
 
 --
 -- Name: COLUMN results.partition_indices; Type: COMMENT; Schema: public; Owner: -
 --
 
-COMMENT ON COLUMN public.results.partition_indices IS 'Only for truck route tests (isTruckRoute partition), a list of the index values for the points in the route path where the partition value changes, separated by the pipe symobl, e.g., 0|20|70.';
+--COMMENT ON COLUMN public.results.partition_indices IS 'Only for truck route tests (isTruckRoute partition), a list of the index values for the points in the route path where the partition value changes, separated by the pipe symobl, e.g., 0|20|70.';
 
 
 --
 -- Name: COLUMN results.partition_lengths; Type: COMMENT; Schema: public; Owner: -
 --
 
-COMMENT ON COLUMN public.results.partition_lengths IS 'Only for truck route tests (isTruckRoute partition), a list of the distances (in kilometres) of each partition, separated by the pipe symbol, e.g., 1.2|5.7|3.2.';
+--COMMENT ON COLUMN public.results.partition_lengths IS 'Only for truck route tests (isTruckRoute partition), a list of the distances (in kilometres) of each partition, separated by the pipe symbol, e.g., 1.2|5.7|3.2.';
 
 
 --
