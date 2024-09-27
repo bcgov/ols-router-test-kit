@@ -31,19 +31,22 @@ import Shared from "../shared.js";
 export default {
   extends: Shared,
 
-  props: ['platform','resultId']
-  ,
+  props: ['platform','resultId'],
   data() {
     return {
       selectedRt: null,
-      iframeSrc: `https://office.refractions.net/~chodgson/gc/ols-demo/?rt=${this.platform}`, 
+      iframeSrc: `https://office.refractions.net/~chodgson/gc/ols-demo/?rt=${this.platform}`,
+      iframeParamString: '', // parameters sent from internal map frame via postMessage()
     };
   },
   async mounted(){
+    window.addEventListener('message', this.handleMessage);
     await this.fetchEnvironments(true)
     const isValidPlatform = this.environments.some(env => env.platform === this.platform);
     this.selectedRt = isValidPlatform ? this.platform : 'Prod';
-    
+  },
+  destroyed() {
+    window.removeEventListener('message', this.handleMessage);
   },
   methods: {
     load() {
@@ -61,32 +64,24 @@ export default {
       }
     },
 
-    updateQueryStringParameter(url, key, value) {
-      const baseUrl = url.split('?')[0];
-      const queryString = url.split('?')[1] || '';
-      const params = new URLSearchParams(queryString);
-
-      // Update or set the parameter
-      if (value === null) {
-        params.delete(key); // Remove the parameter if null
-      } else {
-        params.set(key, value); // Set or update the parameter
-      }
-
-      return `${baseUrl}?${params.toString()}`;
-    },
-
     updateIframeSrc() {
-      // Get the current iframe src
-      //This doesn't work with Crossed Origins, but maybe it will run on the same server eventually so this would try to keep paramaters on a change of server
-      let currentSrc = this.iframeSrc || document.getElementById('mapFrame').contentWindow.location.href;
-      const updatedSrc = this.updateQueryStringParameter(currentSrc, 'rt', this.selectedRt);
+      // Get the current iframe src, and apply the saved router params recieved from the map frame and the rt value from the selector
+      let url = new URL(this.iframeSrc);
+      let params = new URLSearchParams(this.iframeParamString);
+      params.set('rt', this.selectedRt);
+      url.search = params.toString();
 
       // Set the updated src and reload the iframe
-      this.iframeSrc = updatedSrc;
+      this.iframeSrc = url.toString();
       this.load();
     },
 
+    handleMessage(event) {
+      if(event.data.params) {
+        // the internal map frame sends us a message whenever it updates its URL with routing params
+        this.iframeParamString = event.data.params;
+      }
+    }
   },
 };
 </script>
