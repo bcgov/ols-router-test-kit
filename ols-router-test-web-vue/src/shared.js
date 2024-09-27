@@ -112,12 +112,12 @@ export default {
           })
         },        
         fetchEnvironments(usableOnly = false) {
-          axios
+          return axios
           .get(this.ApiUrl + '/environments')
           .then(response => {
             this.environments = response.data;
             if(usableOnly){
-              this.environments = this.environments.filter(env => env.usableAsMapPlatform === true);
+              this.environments = this.environments.filter(env => env.usableAsMapPlatformInd === true);
             }
             });
         },

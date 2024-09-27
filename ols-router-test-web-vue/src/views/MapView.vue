@@ -36,12 +36,13 @@ export default {
   data() {
     return {
       selectedRt: null,
-      iframeSrc: 'https://office.refractions.net/~chodgson/gc/ols-demo/?rt=rri', // Initial iframe URL
+      iframeSrc: `https://office.refractions.net/~chodgson/gc/ols-demo/?rt=${this.platform}`, 
     };
   },
-  mounted(){
-    this.selectedRt = this.platform;
-    this.fetchEnvironments(true)
+  async mounted(){
+    await this.fetchEnvironments(true)
+    const isValidPlatform = this.environments.some(env => env.platform === this.platform);
+    this.selectedRt = isValidPlatform ? this.platform : 'Prod';
     
   },
   methods: {
