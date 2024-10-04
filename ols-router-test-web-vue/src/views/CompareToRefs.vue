@@ -123,7 +123,7 @@
 
             <td> {{ result.description}} </td>
             <td> {{ result.notes}}</td>
-            <td> <button @click="show2OnMap(result.a_result_id, result.b_result_id )">View on Map</button></td>
+            <td> <button @click="show2OnMap(result.a_result_id, result.b_result_id, environment.platform )">View on Map</button></td>
         </tr>
       </tbody>
     </table>
@@ -164,6 +164,25 @@ export default {
   },
   computed: {},
   methods: {
+    initPage(){
+      axios
+        .get(this.ApiUrl + '/run?runId=' + this.runId)
+        .then(response =>{
+          this.run = response.data
+          if(this.run.environmentId){
+            axios
+              .get(this.ApiUrl + '/environment?envId=' + this.run.environmentId) 
+              .then(response => (this.environment = response.data))
+          }
+
+          if(this.run.datasetId){
+            axios
+              .get(this.ApiUrl + '/dataset?datasetId=' + this.run.datasetId) 
+              .then(response => (this.dataset = response.data))
+          }
+        })
+    },
+
     updateTable(){
       var zeroBasePageNum = this.pageNum - 1
       axios
@@ -184,6 +203,7 @@ export default {
   },
   mounted(){
     this.sortBy = "distance_diff"
+    this.initPage();
     this.updateTable()
   }
 }

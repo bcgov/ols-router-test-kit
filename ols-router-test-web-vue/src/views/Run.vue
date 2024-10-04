@@ -1,10 +1,15 @@
 <template>
   <main class="container">
-    <div class="p-1"> Details for Run #{{run.runId}}</div>
+    <div class="p-1"> Details for Run #{{this.run.runId}}</div>
     <table class="table table-striped">
       <tr>
         <td>Description:</td>
         <td>{{ run.description }}</td>
+      </tr>
+
+      <tr>
+        <td>Status:</td>
+        <td>{{ run.status }}</td>
       </tr>
 
       <tr>
@@ -14,7 +19,7 @@
 
       <tr>
         <td>Run Timestamp:</td>
-        <td>{{ formatDate(run.runTimestamp) }}</td>
+        <td>{{ formatDate(run.runTimestamp) }}</td> 
       </tr>
 
       <tr>
@@ -97,7 +102,7 @@
           <td class="right"> {{ Math.ceil(result.duration) }}</td>
           <td class="right"> {{ result.calcTime  }}</td>
           <td class="right"> {{ result.partitionSignature }} </td>
-          <td><button @click="showOnMap(result.resultId)">Show on Map</button></td>
+          <td><button @click="showOnMap(result.resultId, environment.platform)">Show on Map</button></td>
         </tr>
       </tbody>
     </table>
@@ -132,7 +137,8 @@ export default {
       run:{},
       environment:{},
       dataset:{},
-      results:{}
+      results:{},
+      debounceTimeout: null,
     }
 
   },
@@ -157,7 +163,20 @@ export default {
           }
         })
     },
-    updateTable(){
+    updateTable() {
+      // Clear the previous timeout if it exists
+      if (this.debounceTimeout) {
+        clearTimeout(this.debounceTimeout);
+      }
+      //console.log(shared.data().debouceTime); // Outputs: 700
+      // Set a new timeout
+      this.debounceTimeout = setTimeout(() => {
+        // Call the function to update the table
+        this.runUpdateTable();
+      }, Shared.data().debouceTime); // Adjust the delay in shared.js
+    },
+    
+    runUpdateTable(){
       
       var zeroBasePageNum = this.pageNum - 1
       axios

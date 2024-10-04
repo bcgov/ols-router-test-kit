@@ -23,12 +23,12 @@ public class CodeVersion{
 	@Column(name="version_num")
 	String versionNum;
 	String description;
+		
 	
 	
 	
 	
-	
-	public CodeVersion(int codeId, String githubCommitId, String versionNum, String description) {
+	public CodeVersion(int codeId, String versionNum, String description, String githubCommitId) {
 		super();
 		this.codeId = codeId;
 		this.githubCommitId = githubCommitId;
@@ -37,6 +37,12 @@ public class CodeVersion{
 	}
 
 	public CodeVersion() {}
+
+	public CodeVersion(String versionNum, String description, String githubCommitId) {
+		this.versionNum = versionNum;
+		this.description = description;
+		this.githubCommitId = githubCommitId;
+	}
 
 	public int getCodeId() {
 		return codeId;

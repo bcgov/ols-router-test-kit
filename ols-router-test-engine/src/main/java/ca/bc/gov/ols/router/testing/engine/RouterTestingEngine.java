@@ -1,6 +1,7 @@
 package ca.bc.gov.ols.router.testing.engine;
 
 import java.io.BufferedReader;
+
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -26,8 +27,8 @@ import org.springframework.boot.autoconfigure.domain.EntityScan;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 
-import com.google.gson.Gson;
-import com.google.gson.internal.LinkedTreeMap;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 import ca.bc.gov.old.router.testing.engine.utils.ParameterStringBuilder;
 import ca.bc.gov.ols.router.testing.engine.dao.DatasetRepository;
@@ -262,33 +263,17 @@ public class RouterTestingEngine {
 		con.disconnect();
 
 		String content = originalContent.toString();
+		ObjectMapper objectMapper = new ObjectMapper();
 
-		Gson gson = new Gson();
-		Map<Object, Object> attributes = gson.fromJson(content, Map.class);
+		// Convert the JSON content to a Map
+		Map<String, Object> attributes = objectMapper.readValue(content, Map.class);
+		
+		Object partitions = attributes.get("partitions");
+		JsonNode partitionInfo = null;
 
-		String partitionIndices = "";
-		String partitionSignature = "";
-
-		String partition = (String) attributes.get("partition");
-		if ("isTruckRoute".equals(partition)) {
-			ArrayList list = (ArrayList) attributes.get("partitions");
-
-			for (int i = 0; i < list.size(); i++) {
-				LinkedTreeMap ele = (LinkedTreeMap) list.get(i);
-				Map<Object, Object> m = gson.fromJson(content, Map.class);
-				Integer index = ((Double) ele.get("index")).intValue();
-
-				partitionIndices = partitionIndices + index + "|";
-
-				boolean isTruck = (boolean) ele.get(partition);
-				if (isTruck) {
-					partitionSignature = partitionSignature + "1";
-				} else {
-					partitionSignature = partitionSignature + "0";
-				}
-			}
-			partitionIndices = StringUtils.chop(partitionIndices); // get rid of the trailing separator, '|' once the
-																	// string is complete.
+		if (partitions instanceof List) {
+		    List<Map<String, Object>> partitionsList = (List<Map<String, Object>>) partitions;
+		    partitionInfo = objectMapper.valueToTree(partitionsList);
 		}
 
 		ArrayList pointList = (ArrayList) attributes.get("route");
@@ -298,18 +283,28 @@ public class RouterTestingEngine {
 		// the correct object type just using .toArray(), so we do this instead:
 		for (int i = 0; i < pointList.size(); i++) {
 			ArrayList point = (ArrayList) pointList.get(i);
-			Coordinate c = new Coordinate((Double) point.get(0), (Double) point.get(1));
+			Coordinate c = new Coordinate(
+				    ((Number) point.get(0)).doubleValue(), 
+				    ((Number) point.get(1)).doubleValue()
+				);
 			pointArray[i] = c;
 		}
 		Geometry route = gf.createLineString(pointArray);
 
-		double dis = (double)attributes.get("distance");
+		double dis = ((Number)attributes.get("distance")).doubleValue();
 		if (dis > 0){
 			dis = dis * 1000; //only convert to m if value is positive.
 		}
-		Result result = new Result(runId, testId, (double) attributes.get("executionTime"),
-				dis, route, (double) attributes.get("time"), partitionSignature,
-				partitionIndices);
+
+		Result result = new Result(
+			    runId,
+			    testId,
+			    ((Number) attributes.get("executionTime")).doubleValue(),
+			    dis,
+			    route,
+			    ((Number) attributes.get("time")).doubleValue(),
+			    partitionInfo
+			);
 
 		return result;
 

@@ -166,6 +166,7 @@ export default {
             second: 'numeric',
             timeZoneName: 'short',
         },
+        debounceTimeout: null,
 
     }
 
@@ -173,7 +174,19 @@ export default {
   computed: {
   },
   methods: {
-    updateTable(){
+    updateTable() {
+      // Clear the previous timeout if it exists
+      if (this.debounceTimeout) {
+        clearTimeout(this.debounceTimeout);
+      }
+
+      // Set a new timeout
+      this.debounceTimeout = setTimeout(() => {
+        // Call the function to update the table
+        this.runUpdateTable();
+      }, Shared.data().debouceTime); // Adjust the delay in shared.js
+    },
+    runUpdateTable(){
       var zeroBasePageNum = this.pageNum - 1
       axios
         .get(this.ApiUrl + '/runs?pageNumber=' + zeroBasePageNum + '&perPage=' + this.perPage + '&sortBy=' + this.sortBy + '&descending=' + this.descending)

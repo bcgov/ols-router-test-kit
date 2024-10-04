@@ -12,6 +12,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Optional;
 import java.util.stream.Stream;
+import java.time.ZonedDateTime;
 
 import org.geolatte.geom.Feature;
 import org.geolatte.geom.G2D;
@@ -30,6 +31,13 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.fasterxml.jackson.annotation.JsonView;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+
+import ca.bc.gov.old.router.testing.web.utilities.RouterApiClient;
+import ca.bc.gov.old.router.testing.web.utilities.RouteResponse;
+import ca.bc.gov.old.router.testing.web.utilities.RouterStatusResponse;
 
 import ca.bc.gov.ols.router.testing.engine.dao.CodeVersionRepository;
 import ca.bc.gov.ols.router.testing.engine.dao.DatasetRepository;
@@ -45,6 +53,9 @@ import ca.bc.gov.ols.router.testing.engine.entity.Run;
 import ca.bc.gov.ols.router.testing.engine.entity.Test;
 import ca.bc.gov.ols.router.testing.engine.entity.View;
 import ca.bc.gov.ols.router.testing.web.exceptions.InvalidParameterException;
+import jakarta.persistence.Column;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 
 
 //@CrossOrigin(maxAge = 3600)
@@ -85,7 +96,7 @@ public class ApiController {
 	@JsonView(View.Default.class)
 	//above JsonView line means we don't send the geom, it's big and not necessary for this call, remove that line and all fields are sent.
 	//in the entity(Result) Class itself you can see the @JsonView things that define which fields are in which view
-	public List<Result>getSortedPagedResults(@RequestParam(defaultValue = "0")int pageNumber, @RequestParam(defaultValue = "10") int perPage, @RequestParam(defaultValue = "runId") String sortBy, @RequestParam Optional<Boolean> descending, @RequestParam Optional<String> filterColumn, @RequestParam Optional<Integer> filterValue) {
+	public List<Map>getSortedPagedResults(@RequestParam(defaultValue = "0")int pageNumber, @RequestParam(defaultValue = "10") int perPage, @RequestParam(defaultValue = "runId") String sortBy, @RequestParam Optional<Boolean> descending, @RequestParam Optional<String> filterColumn, @RequestParam Optional<Integer> filterValue) {
 		Direction order;
 		
 		if (descending.isPresent() && descending.get()==true) {
@@ -95,16 +106,15 @@ public class ApiController {
 		}
 		try {		
 			PageRequest pageReq = PageRequest.of(pageNumber, perPage, order, sortBy);
-			Page<Result> pageRes = null;
+			List<Map> pageRes = null;
 			if(!filterColumn.isEmpty() && "runId".equals(filterColumn.get())) {
-				pageRes = resultRepository.findByRunIdIs(filterValue.get(), pageReq);
+				pageRes = resultRepository.findByRunIdIsCustom(filterValue.get(), pageReq);
 			}else if(!filterColumn.isEmpty() && "testId".equals(filterColumn.get())) {
-				pageRes = resultRepository.findByTestIdIs(filterValue.get(), pageReq);
+				pageRes = resultRepository.findByTestIdIsCustom(filterValue.get(), pageReq);
 			}else {
-				pageRes = resultRepository.findAll(pageReq);
+				pageRes = resultRepository.findAllCustom(pageReq);
 			}
-			List<Result> list = pageRes.getContent();
-			return list;
+			return pageRes;
 		}catch (Exception e){
 			throw new InvalidParameterException("Invalid parameter value given. " + e.getMessage());
 		}
@@ -435,6 +445,7 @@ public class ApiController {
 		return resultList;
 	}
 
+
 	/**
 	 * Returns specific results from the database in geojson structure 
 	 * @param ids - a comma separated list of result_ids the users wants details on  	 
@@ -465,13 +476,6 @@ public class ApiController {
 						id = (Integer)value;
 						// no break because we also add the id to the props
 					default:
-						if("partition_indices".equals(key)) {
-							if(value == null || ((String)value).isEmpty()) {
-								value = Collections.emptyList();
-							} else {
-								value = Stream.of(((String)value).split("\\|")).map(s -> Integer.valueOf(s)).toArray(Integer[]::new);
-							}
-						}
 						props.put(key, value);
 					}
 				}
@@ -546,15 +550,128 @@ public class ApiController {
     public Test createTest(@RequestBody Test test) {
         return testRepository.save(test);
     }
-    
-    @PostMapping("/createRun")
-    public Run createRun(@RequestBody Run run) {
-        return runRepository.save(run);
-    }
-    
+
     @PostMapping("/createCodeVersion")
     public CodeVersion createCodeVersion(@RequestBody CodeVersion codeVersion) {
         return codeVersionRepository.save(codeVersion);
     }
+    
+    //If the datasetId or codeId attributes in the run object passed in are null, 
+    //this function will make a call to the specified environment and fill out the 2 former attrs appropriately based on the results
+    //The above is the recommended usage to ensure correct values for code version and dataset are stored in the test results.
+    @PostMapping("/createRun")
+    public ResponseEntity<?> createRun(@RequestBody Run run) {
+    	
+    	if (run.getDatasetId() == null || run.getCodeId() == null) {
+	    	//check the router response and get the exact "codeId" And "datasetId" it is using, then put that in the Run object
+	    	//First try the router's   /status/ API that was recently added, 
+	    	//then fall back to an simple router request in case this version doesn't support the /status option yet
+
+    		Dataset newDataset = null;
+			CodeVersion newCodeVersion = null;
+			RouterStatusResponse statusResponse = null;
+            ZonedDateTime roadNetworkTimestamp = null;
+            String codeVersion = null;
+			
+    		try{
+    			RouterApiClient apiClient = new RouterApiClient();
+
+    			Environment environment = environmentRepository.findById(run.getEnvironmentId())
+    				    .orElseThrow(() -> new RuntimeException("Environment not found for ID: " + run.getEnvironmentId()));
+
+   				String url = environment.getBaseApiUrl();
+   				String key = environment.getApiKey();
+	    	
+		    	//Check the /status   API for details first
+    			url = url + "status";
+    			String response = apiClient.get(url);
+
+	            ObjectMapper objectMapper = new ObjectMapper();
+	            objectMapper.registerModule(new JavaTimeModule());
+	            JsonNode rootNode = objectMapper.readTree(response);
+
+    			// Check if gitCommitId exists, if not, it's an older API so skip to the fall back plan
+    	        if (rootNode.has("gitCommitId")) {
+	                statusResponse = objectMapper.readValue(response, RouterStatusResponse.class);
+	                roadNetworkTimestamp = statusResponse.getRoadNetworkTimestamp();
+	                codeVersion = statusResponse.getVersion();
+	                String GitCommitId = statusResponse.getGitCommitId();
+		    	
+	                //Lookup the Dataset that matches the RoadNetworktimestamp or create a new one if it doesn't exist yet:
+	                newDataset = findOrCreateDataset(roadNetworkTimestamp);
+	                //Lookup Code Version number and create it if it doesn't exist:
+	                newCodeVersion = findOrCreateCodeVersion(codeVersion, GitCommitId);
+	
+	                run.setDatasetId(newDataset.getDatasetId());
+	        		run.setCodeId(newCodeVersion.getCodeId());
+    	        }                
+                
+	    		//Check the regular router request if we failed to find values so far
+	    		if (run.getDatasetId() == null || run.getCodeId() == null) {
+		
+	   				//make a very simple/short route request
+	    			url = environment.getBaseApiUrl();
+	    			url = url + "directions.json?apikey=" + key + "&points=-123.36487770080568,48.42547002823357,-123.37015628814699,48.41812208203614&criteria=fastest";
+	    			
+	    			//System.out.println("URL: " + url);
+	    			response = apiClient.get(url);
+		            //System.out.println("Response: " + response);
+		            
+	    			//get the roadNetworkTimestamp reported by the router
+		            objectMapper = new ObjectMapper();
+		            objectMapper.registerModule(new JavaTimeModule());
+	                RouteResponse routeResponse = objectMapper.readValue(response, RouteResponse.class);
+	                roadNetworkTimestamp = routeResponse.getRoadNetworkTimestamp();
+	                codeVersion = routeResponse.getVersion();
+	
+	                //Lookup the Dataset that matches the RoadNetworktimestamp or create a new one if it doesn't exist yet:
+	                newDataset = findOrCreateDataset(roadNetworkTimestamp);
+	                //Lookup Code Version number and create it if it doesn't exist:
+	                newCodeVersion = findOrCreateCodeVersion(codeVersion, null);
+
+	                run.setDatasetId(newDataset.getDatasetId());
+	        		run.setCodeId(newCodeVersion.getCodeId());
+	    		}    	
+    		} catch (Exception e) {
+	            e.printStackTrace();
+	            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                        .body("An error occurred while creating the Run: " + e.getMessage());
+	        }
+    		
+    	}
+    	
+    	runRepository.save(run);
+        return ResponseEntity.status(HttpStatus.CREATED).body(run);
+    }
+    
+    
+    // Method to find or create a Dataset by road network timestamp
+    private Dataset findOrCreateDataset(ZonedDateTime roadNetworkTimestamp) {
+        Optional<Dataset> existingDataset = datasetRepository.findByRoadNetworkTimestamp(roadNetworkTimestamp);
+        if (existingDataset.isPresent()) {
+            return existingDataset.get();
+        } else {
+            Dataset newDataset = new Dataset(false, "ITN", roadNetworkTimestamp, "Default ITN");
+            return datasetRepository.save(newDataset);
+        }
+    }
+
+    // Method to find or create a CodeVersion by version number and GitCommitID
+    private CodeVersion findOrCreateCodeVersion(String codeVersion, String githubCommitId) {
+        // Attempt to find a matching CodeVersion where both versionNum and githubCommitId match
+        Optional<CodeVersion> existingVersion = codeVersionRepository.findByVersionNumAndGithubCommitId(codeVersion, githubCommitId);
+
+        if (existingVersion.isPresent()) {
+            // Return the existing CodeVersion if both codeVersion and githubCommitId match
+            return existingVersion.get();
+        } else {
+            // Create a new CodeVersion if no match was found
+            CodeVersion newCodeVersion = new CodeVersion(codeVersion, "", githubCommitId);
+            return codeVersionRepository.save(newCodeVersion);
+        }
+    }
+
+
+
     
 }
