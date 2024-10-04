@@ -1,6 +1,7 @@
 package ca.bc.gov.ols.router.testing.engine.dao;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -17,4 +18,9 @@ public interface CodeVersionRepository extends JpaRepository<CodeVersion, Intege
 	
 	@Query("SELECT c FROM CodeVersion c ORDER BY c.versionNum DESC")
     List<CodeVersion> findAllWithCustomSorting();
+	
+	
+	Optional<CodeVersion> findByVersionNum(String versionNum);
+	
+	Optional<CodeVersion> findByVersionNumAndGithubCommitId(String versionNum, String githubCommitId);
 }

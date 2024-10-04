@@ -24,6 +24,7 @@ CREATE EXTENSION IF NOT EXISTS postgis WITH SCHEMA public;
 
 -- Create the databse objects as the app owner user
 -- this needs to match the owner user previously created
+GRANT ALL ON SCHEMA public TO ols_router_test_kit_owner;
 SET ROLE ols_router_test_kit_owner;
 
 SET default_tablespace = '';
@@ -188,7 +189,8 @@ CREATE TABLE public.environments (
     platform character varying(50),
     environment character varying(50),
     base_api_url character varying(100),
-    api_key character varying(50)
+    api_key character varying(50),
+    usable_as_map_platform boolean
 );
 
 
@@ -257,18 +259,19 @@ ALTER SEQUENCE public.environments_env_id_seq OWNED BY public.environments.env_i
 --
 -- Name: results; Type: TABLE; Schema: public; Owner: -
 --
-
 CREATE TABLE public.results (
     result_id integer NOT NULL,
     run_id integer,
     test_id integer,
     calc_time real,
     distance real,
-    route_geometry public.geometry(Geometry,3005),
+    route_geometry public.geometry(Geometry, 3005),
     duration real,
-    partition_signature character varying(20),
-    partition_indices character varying(120),
-    partition_lengths character varying(300)
+    partition_info jsonb
+    --prior to test kit "phase2" changes ~Sept2024 we had these cols:
+    --partition_signature character varying(20),
+	--partition_indices character varying(120),
+	--partition_lengths character varying(300)
 );
 
 
@@ -329,24 +332,31 @@ COMMENT ON COLUMN public.results.duration IS 'The travel time (in seconds) retur
 
 
 --
+-- Name: COLUMN results.partition_info; Type: COMMENT; Schema: public; Owner: -
+--
+
+COMMENT ON COLUMN public.results.partition_info IS 'The parition info is a set of json objects each with three key value pairs: index, distance and partition type/value. The index value represents the route node index where the partition starts.  The distance value is a measure of the length of the partition in kilometres. The partition key is a string label of the type, and its value represents the state or name of the partition.  Example: [{"index": "0", "distance": "", "isTruckRoute": false}, {"index": "28", "distance": "", "isTruckRoute": true}]';
+
+
+--
 -- Name: COLUMN results.partition_signature; Type: COMMENT; Schema: public; Owner: -
 --
 
-COMMENT ON COLUMN public.results.partition_signature IS 'Only for truck route tests (isTruckRoute partition), the signature is a sequence of alternating 1s and 0s that represents the alternating partitions of the route as it transitions between 1 (true, partition is a truck route) and 0 (false, partition is not a truck route), e.g., 010.';
+--COMMENT ON COLUMN public.results.partition_signature IS 'Only for truck route tests (isTruckRoute partition), the signature is a sequence of alternating 1s and 0s that represents the alternating partitions of the route as it transitions between 1 (true, partition is a truck route) and 0 (false, partition is not a truck route), e.g., 010.';
 
 
 --
 -- Name: COLUMN results.partition_indices; Type: COMMENT; Schema: public; Owner: -
 --
 
-COMMENT ON COLUMN public.results.partition_indices IS 'Only for truck route tests (isTruckRoute partition), a list of the index values for the points in the route path where the partition value changes, separated by the pipe symobl, e.g., 0|20|70.';
+--COMMENT ON COLUMN public.results.partition_indices IS 'Only for truck route tests (isTruckRoute partition), a list of the index values for the points in the route path where the partition value changes, separated by the pipe symobl, e.g., 0|20|70.';
 
 
 --
 -- Name: COLUMN results.partition_lengths; Type: COMMENT; Schema: public; Owner: -
 --
 
-COMMENT ON COLUMN public.results.partition_lengths IS 'Only for truck route tests (isTruckRoute partition), a list of the distances (in kilometres) of each partition, separated by the pipe symbol, e.g., 1.2|5.7|3.2.';
+--COMMENT ON COLUMN public.results.partition_lengths IS 'Only for truck route tests (isTruckRoute partition), a list of the distances (in kilometres) of each partition, separated by the pipe symbol, e.g., 1.2|5.7|3.2.';
 
 
 --

@@ -77,11 +77,14 @@ const router = createRouter({
       component: List
     },
     {
-      path: '/map/:resultId*',
+      path: '/map/:platform?/:resultId*/',
       name: 'map',
-      props: (route) => ({ resultId:route.params.resultId }),
+      props: (route) => ({
+        resultId: route.params.resultId,
+        platform: route.params.platform || 'Prod'
+      }),
       component: MapView
-    },
+    }
   ]
 })
 

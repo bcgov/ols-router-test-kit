@@ -30,8 +30,13 @@ public class Dataset{
 	public Dataset() {}
 	
 	public Dataset(int datasetId, Boolean isBcSubsetInd, String roadSource, ZonedDateTime roadNetworkTimestamp, String description) {
-		super();
 		this.datasetId = datasetId;
+		this.isBcSubsetInd = isBcSubsetInd;
+		this.roadSource = roadSource;
+		this.roadNetworkTimestamp = roadNetworkTimestamp;
+		this.description = description;
+	}
+	public Dataset(Boolean isBcSubsetInd, String roadSource, ZonedDateTime roadNetworkTimestamp, String description) {
 		this.isBcSubsetInd = isBcSubsetInd;
 		this.roadSource = roadSource;
 		this.roadNetworkTimestamp = roadNetworkTimestamp;

@@ -45,7 +45,10 @@ public class Run{
 	ZonedDateTime runTimestamp;
 	@Column(name="group_name")
 	String groupName;
+	@Column(name="code_id")
+	Integer codeId;
 	
+
 	@JdbcTypeCode(SqlTypes.JSON)
 	JsonNode parameters;
 
@@ -55,10 +58,6 @@ public class Run{
 	
 	
 	public Run() {}
-
-
-
-
 
 
 
@@ -115,6 +114,13 @@ public class Run{
 		this.datasetId = datasetId;
 	}
 
+	public Integer getCodeId() {
+		return codeId;
+	}
+
+	public void setCodeId(Integer codeId) {
+		this.codeId = codeId;
+	}
 
 	public Integer getEnvironmentId() {
 		return environmentId;

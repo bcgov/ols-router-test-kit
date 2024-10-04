@@ -15,16 +15,30 @@ export default {
         environments: [],
         groupNameOptions: [],
         codeVersions: [],
-        ApiUrl: "https://ols-route-test-prod.apps.gov.bc.ca/api",
+        ApiUrl: "https://ols-route-test-dev.apps.gov.bc.ca/api",
+        debouceTime: 700,
+        debounceTimeout: null,
       }
     },
     methods: {
+        updateTable() {
+          // Clear the previous timeout if it exists
+          if (this.debounceTimeout) {
+            clearTimeout(this.debounceTimeout);
+          }
+    
+          // Set a new timeout
+          this.debounceTimeout = setTimeout(() => {
+            // Call the function to update the table
+            this.runUpdateTable();
+          }, this.debouceTime); // Adjust the delay in shared.js
+        },
         setSortBy(col){
             if (this.sortBy == col){
               this.descending = !this.descending
             }else{
               this.sortBy = col
-              this.descending = false
+              this.descending = true
             }
             this.updateTable()
         },
@@ -49,18 +63,39 @@ export default {
             if (this.pageNum > this.maxPages) this.pageNum = this.maxPages;
             this.updateTable()
           },
-        showOnMap(resultId){
-          this.$router.push({name: 'map', params: {resultId:[resultId]} })
-          //location.href = this.baseUrl + "?rt=" + this.defaultRt + "&test_results=" 
-          //    + encodeURIComponent(this.ApiUrl + "/resultsGeoJson?ids=" + resultId)
-        },
-        show2OnMap(resultId, resultId2){
-          this.$router.push({name: 'map', params: {resultId:[resultId, resultId2]} })
-          //location.href = this.baseUrl + "?rt=" + this.defaultRt + "&test_results=" 
-          //    + encodeURIComponent(this.ApiUrl + "/resultsGeoJson?ids=" + resultId + "," + resultId2)
+        showOnMap(resultId, platform) {
+          //this.$router.push({ name: 'map', params: { resultId: resultId.toString() } });
+          // Open the route in a new window instead
+          window.open(
+            this.$router.resolve({
+              name: 'map',
+              params: { resultId: resultId.toString(),
+                        platform: platform.toString() 
+               }
+            }).href,
+            '_blank'
+          );
+        },       
+        show2OnMap(resultId, resultId2, platform) {
+          const combinedResultId = `${resultId},${resultId2}`;
+          // Open the route in a new window
+          window.open(
+            this.$router.resolve({
+              name: 'map',
+              params: { resultId: combinedResultId,
+                        platform: platform.toString() 
+               }
+            }).href,
+            '_blank'
+          );
         },
         formatDate(date){
-          return new Date(date);
+          if (date == null) {
+            return '';
+          } else {
+            return new Date(date);
+          }
+          
         },      
         fetchGroupNames(){
           axios
@@ -76,11 +111,14 @@ export default {
             this.groupNameOptions.push(allOption)
           })
         },        
-        fetchEnvironments() {
-          axios
+        fetchEnvironments(usableOnly = false) {
+          return axios
           .get(this.ApiUrl + '/environments')
           .then(response => {
-            this.environments = response.data
+            this.environments = response.data;
+            if(usableOnly){
+              this.environments = this.environments.filter(env => env.usableAsMapPlatformInd === true);
+            }
             });
         },
         fetchDatasets() {

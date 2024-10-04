@@ -79,14 +79,27 @@ export default {
         sortBy:"testId",
         descending:false,
         maxPages:9999999,
-        bulkTests:null
+        bulkTests:null,
+        debounceTimeout: null,
     }
 
   },
   computed: {
   },
   methods: {
-    updateTable(){
+    updateTable() {
+      // Clear the previous timeout if it exists
+      if (this.debounceTimeout) {
+        clearTimeout(this.debounceTimeout);
+      }
+
+      // Set a new timeout
+      this.debounceTimeout = setTimeout(() => {
+        // Call the function to update the table
+        this.runUpdateTable();
+      }, Shared.data().debouceTime); // Adjust the delay in shared.js
+    },
+    runUpdateTable(){
       var zeroBasePageNum = this.pageNum - 1
       axios
         .get(this.ApiUrl + '/bulkTests?pageNumber=' + zeroBasePageNum + '&perPage=' + this.perPage + '&sortBy=' + this.sortBy + '&descending=' + this.descending)
