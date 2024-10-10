@@ -336,7 +336,7 @@ CREATE TABLE public.results (
     test_id integer,
     calc_time real,
     distance real,
-    route_geometry public.geometry(Geometry,3005),
+    route_geometry public.geometry(Geometry,4326),
     duration real,
     partition_info jsonb
 );
