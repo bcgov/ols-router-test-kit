@@ -548,6 +548,7 @@ public class ApiController {
     
     @PostMapping("/createTest")
     public Test createTest(@RequestBody Test test) {
+    	 test.setCreatedTimestamp(ZonedDateTime.now());  // Set the current timestamp
         return testRepository.save(test);
     }
 

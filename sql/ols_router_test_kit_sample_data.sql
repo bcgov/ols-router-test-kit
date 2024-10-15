@@ -19811,6 +19811,9 @@ SELECT pg_catalog.setval('public.runs_run_id_seq', 618, true);
 SELECT pg_catalog.setval('public.tests_test_id_seq', 25063, true);
 
 
+--update to one of the dev environments
+UPDATE environments SET base_api_url = 'https://ssl.refractions.net/ols/router/',  usable_as_map_platform_ind = 't' WHERE platform = 'Dev: Gazelle';
+
 --
 -- PostgreSQL database dump complete
 --

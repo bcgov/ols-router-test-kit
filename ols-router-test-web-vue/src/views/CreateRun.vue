@@ -2,7 +2,9 @@
     <div>
       
     &nbsp
+    
       <form @submit.prevent="submitForm">
+        
         <table class="table table-striped">
           <tbody>
             <td colspan="2" class="headerColour"><h2>Create New Run</h2></td>
@@ -77,7 +79,9 @@
                 </td>
             </tr>
             <tr>
-              <td colspan="2" ><button type="submit" :disabled="!isFormValid">Create New Run for Router Testing</button></td>
+              <td colspan="2" ><button type="submit" :disabled="!isFormValid || loading" >
+                {{ loading ? "Waiting for response..." : "Create New Run for Router Testing" }}
+              </button></td>
             </tr>
           </tbody>
         </table>
@@ -113,8 +117,8 @@
         datasets: [],
         environments: [],
         groupNameOptions: [],
-        codeVersions: []
-
+        codeVersions: [],
+        loading: false,
       };
     },
     watch: {
@@ -164,6 +168,8 @@
         return urlRegex.test(url) && routeParamsRegex.test(url);
       },
       submitForm() {
+        this.loading = true;
+        console.log('Loading:', this.loading);  
         // Set queuedTimestamp to the current time on form submission
         this.run.queuedTimestamp = new Date().toISOString();
 
@@ -190,7 +196,10 @@
             .catch(error => {
             console.error('Error creating Run:', error);
             window.alert('Error creating new Run');
-            });
+            })
+            .finally(() => {
+            this.loading = false; // End loading
+    });
         
       },
       fetchEnvironments() {
