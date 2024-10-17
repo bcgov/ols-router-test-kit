@@ -332,7 +332,38 @@ public class ApiController {
 		return environmentRepository.findAll(sortBy);
 		
 	}
+
+	/**
+	 * Returns All code versions 
+	 */
+	@RequestMapping("/codeVersions")
+	public List<CodeVersion> getCodeVersions() {
+		return codeVersionRepository.findAllWithCustomSorting();
+	}
+
+	/**
+	 * Returns a single codeVersion
+	 * @param codeId - the id for the one you want  
+	 */
+	@RequestMapping("/codeVersion")
+	public CodeVersion getCodeVersion(@RequestParam int codeId) {
+		try {
+			return codeVersionRepository.findById(codeId).get();
+		}catch (Exception e){
+			throw new InvalidParameterException("Invalid parameter value given. " + e.getMessage());
+		}
+	}
+
 	
+	/**
+	 * Returns All datasets 
+	 */
+	@RequestMapping("/datasets")
+	public List<Dataset> getdatasets() {
+		return datasetRepository.findAllWithCustomSorting();
+	}
+
+
 	/**
 	 * Returns a single dataset
 	 * @param datasetId - the id for the one you want  
@@ -503,22 +534,6 @@ public class ApiController {
 		return testRepository.getGroupNameOptopns();
 	}
 	
-	/**
-	 * Returns All code versions 
-	 */
-	@RequestMapping("/codeVersions")
-	public List<CodeVersion> getCodeVersion() {
-		return codeVersionRepository.findAllWithCustomSorting();
-	}
-	
-	/**
-	 * Returns All datasets 
-	 */
-	@RequestMapping("/datasets")
-	public List<Dataset> getdatasets() {
-		return datasetRepository.findAllWithCustomSorting();
-	}
-
 	/*
 	 * Updates a testId with a new Forward Reference ID
 	 */
