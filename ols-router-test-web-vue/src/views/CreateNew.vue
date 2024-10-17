@@ -42,7 +42,9 @@
         </tr>
         <tr>
           <td colspan="2">
-            <button type="submit" :disabled="!isTestFormValid">Create New Test</button>
+            <button type="submit" :disabled="!isTestFormValid || loading">
+              {{ loading ? "Waiting for response..." : "Create New Test"}}
+              </button>
           </td>
         </tr>
       </table>
@@ -84,7 +86,9 @@
         <td><input v-model="environmentData.apiKey" size="50" type="text"/></td>
       </tr>
       <tr>
-        <td colspan="2"><button type="submit" :disabled="!isEnvFormValid">Create Environment</button></td>
+        <td colspan="2"><button type="submit" :disabled="!isEnvFormValid || loading">
+          {{ loading ? "Waiting for response..." : "Create New Environment"}}
+        </button></td>
         
       </tr>
 
@@ -130,7 +134,9 @@
           Cannot be blank.</div></td>
       </tr>
       <tr>
-        <td colspan="2" ><button type="submit" :disabled="!isDatasetFormValid">Create Dataset</button></td>
+        <td colspan="2" ><button type="submit" :disabled="!isDatasetFormValid || loading">
+          {{ loading ? "Waiting for response..." : "Create New Dataset"}}
+        </button></td>
       </tr>
     </table>
   </form>
@@ -166,7 +172,9 @@
           </td>
         </tr>
         <tr>
-        <td colspan="2"><button type="submit" :disabled="!isCodeFormValid">Create Code Version</button></td>
+        <td colspan="2"><button type="submit" :disabled="!isCodeFormValid || loading">
+          {{ loading ? "Waiting for response..." : "Create New Code Version"}}
+        </button></td>
       </tr>
       </tbody>
     </table>
@@ -225,6 +233,7 @@ export default {
       testDirty: false,
       codeVersionDirty:false,
       groupNameOptions: [],
+      loading:false,
     };
   },
   watch: {
@@ -278,6 +287,7 @@ export default {
   },
   methods: {
     createEnvironment() {
+      this.loading = true;
       console.log('Creating Environment:', this.environmentData);
       axios.post(this.ApiUrl + '/createEnvironment', this.environmentData)
         .then(response => {
@@ -287,9 +297,13 @@ export default {
         .catch(error => {
           console.error('Error creating environment:', error);
           window.alert('Error creating new environment');
+        })
+        .finally(() => {
+            this.loading = false; // End loading
         });
     },
     createDataset() {
+      this.loading = true;
       console.log('Creating Dataset:', this.datasetData);
       axios.post(this.ApiUrl + '/createDataset', this.datasetData)
         .then(response => {
@@ -299,9 +313,13 @@ export default {
         .catch(error => {
           console.error('Error creating dataset:', error);
           window.alert('Error creating new dataset');
+        })
+        .finally(() => {
+            this.loading = false; // End loading
         });
     },
     createTest(){
+      this.loading = true;
       console.log('Creating Test:', this.datasetData);
 
       try{
@@ -327,9 +345,13 @@ export default {
         .catch(error => {
           console.error('Error creating Test:', error);
           window.alert('Error creating new Test');
+        })        
+        .finally(() => {
+            this.loading = false; // End loading
         });
     },
     createCodeVersion(){
+      this.loading = true;
       console.log('Creating Dataset:', this.codeForm);
       axios.post(this.ApiUrl + '/createCodeVersion', this.codeForm)
         .then(response => {
@@ -339,6 +361,9 @@ export default {
         .catch(error => {
           console.error('Error creating Code Version:', error);
           window.alert('Error creating new Code Version');
+        })
+        .finally(() => {
+            this.loading = false; // End loading
         });
     },
     isValidUrl(url) {
