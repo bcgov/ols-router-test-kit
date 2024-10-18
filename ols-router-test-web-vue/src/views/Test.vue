@@ -2,7 +2,7 @@
   <main class="container">
     
     <div class="p-1">RouterNG Test Results for Test # {{ test.testId }}</div>
-    <div>Description: A single test and it's attributes. Below are all the associated results that used this specific test definition.</div>
+    <div>Description: A single test and its attributes. Below are all the associated results that used this specific test definition.</div>
     <div> &nbsp</div>
 
     <table class="table table-striped">

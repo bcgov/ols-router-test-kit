@@ -31,7 +31,11 @@
         <td>Data Set:</td>
         <td>{{ dataset.roadSource + " - " + formatDate(dataset.roadNetworkTimestamp) + " - " + dataset.description }}</td>
       </tr>
-
+      
+      <tr>
+        <td>Code Version:</td>
+        <td>{{ codeVersion.versionNum }}</td>
+      </tr>
       <tr>
         <td>Direction:</td>
         <td><p v-if=run.forwardRouteInd > Forward</p>
@@ -137,6 +141,7 @@ export default {
       run:{},
       environment:{},
       dataset:{},
+      codeVersion:{},
       results:{},
       debounceTimeout: null,
     }
@@ -160,6 +165,12 @@ export default {
             axios
               .get(this.ApiUrl + '/dataset?datasetId=' + this.run.datasetId) 
               .then(response => (this.dataset = response.data))
+          }
+
+          if(this.run.codeId){
+            axios
+              .get(this.ApiUrl + '/codeVersion?codeId=' + this.run.codeId) 
+              .then(response => (this.codeVersion = response.data))
           }
         })
     },
