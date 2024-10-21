@@ -107,7 +107,7 @@
               ▲
           </template>
         </th>
-        <th>Reference?</th>
+        <th v-if="test.groupName === 'Custom'">Reference?</th>
 
       </tr>
         <tr v-for="result in results" >  
@@ -118,7 +118,15 @@
           <td class="right"> {{ Math.ceil(result.duration) }}</td>
           <td class="right"> {{ result.calcTime  }}</td>
           <td class="right"> {{ result.partitionSignature }} </td>
-          <td><button @click="setAsRef(result.resultId)">Set as Forward Reference</button></td>
+          <td v-if="test.groupName === 'Custom'">
+            <button v-if="result.resultId !== test.forwardResultId" @click="setAsRef(result.resultId)">
+              Set as Forward Reference
+            </button>
+            <!-- Don't show button ifthis is the current forward Ref-->
+            <span v-else>
+              Current Fwd Reference
+            </span>
+          </td>
         </tr>
       </tbody>
     </table>
