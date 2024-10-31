@@ -102,8 +102,7 @@ public interface ResultRepository extends JpaRepository <Result, Integer> {
 			+ "    t.notes as notes"
 			+ "  FROM Result b JOIN Test t on b.testId = t.testId"
 			+ "    LEFT JOIN Run r ON b.runId = r.runId"
-			+ "    LEFT JOIN Result a ON (r.forwardRouteInd AND t.forwardResultId = a.resultId)"
-			+ "      OR (NOT r.forwardRouteInd AND t.reverseResultId = a.resultId)"
+			+ "    LEFT JOIN Result a ON t.forwardResultId = a.resultId"
 			+ "  WHERE b.runId = :runId AND t.groupName = 'Custom'")
 	List<Map> compareRunVsRef(@Param("runId") Integer runId, Pageable pageable);
 
@@ -113,8 +112,7 @@ public interface ResultRepository extends JpaRepository <Result, Integer> {
 	@Query(value ="SELECT count(*) "
 			+ "  FROM Result b JOIN Test t on b.testId = t.testId"
 			+ "    LEFT JOIN Run r ON b.runId = r.runId"
-			+ "    LEFT JOIN Result a ON (r.forwardRouteInd AND t.forwardResultId = a.resultId)"
-			+ "      OR (NOT r.forwardRouteInd AND t.reverseResultId = a.resultId)"
+			+ "    LEFT JOIN Result a ON t.forwardResultId = a.resultId"
 			+ "  WHERE b.runId = :runId AND t.groupName = 'Custom'")
 	Integer compareRunVsRefCount(@Param("runId") Integer runId);
 	

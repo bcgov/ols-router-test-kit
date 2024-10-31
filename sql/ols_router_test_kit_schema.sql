@@ -558,7 +558,6 @@ CREATE TABLE public.tests (
     description character varying(240),
     group_name character varying(50),
     result_id_fwd_ref integer,
-    result_id_rev_ref integer,
     notes character varying(300),
     good_demo_case_ind boolean,
     points character varying(400),
