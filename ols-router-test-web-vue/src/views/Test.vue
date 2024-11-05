@@ -34,13 +34,9 @@
       </template>
       <tr v-if="this.test.groupName==='Custom'">
         <td>Forward Reference:</td>
-        <td class="thLink" @click="showOnMap(test.forwardResultId)">  {{ test.forwardResultId }}</td>
+        <td class="thLink" @click="aboutToShowOnMap(test.forwardResultId)">  {{ test.forwardResultId }}</td>
       </tr>
 
-      <tr v-if="this.test.groupName==='Custom'">
-        <td>Reverse Reference:</td>
-        <td class="thLink" @click="showOnMap(test.reverseResultId)">{{ test.reverseResultId }}</td>
-      </tr>
     </table>
 
 
@@ -162,6 +158,7 @@ export default {
   },
   data(){
     return{
+        refPlatform: null,
         test:{},
         results:{}
     }
@@ -174,7 +171,10 @@ export default {
       this.sortBy = "runId"
       axios
         .get(this.ApiUrl + '/test?testId=' + this.testId)
-        .then(response =>{this.test = response.data})
+        .then(response =>{
+          this.test = response.data
+          this.initializeRefPlatform()
+        })
     },
 
     updateTable(){
@@ -183,8 +183,9 @@ export default {
       axios
         .get(this.ApiUrl + '/resultListForTest?testId=' + this.testId + '&pageNumber=' + zeroBasePageNum + '&perPage=' + this.perPage + '&sortBy=' + this.sortBy + '&descending=' + this.descending)
         .then(response => {
-          this.results = response.data 
-          this.curPageCount = this.results.length 
+          this.results = response.data
+          this.curPageCount = this.results.length
+          this.initializeRefPlatform()
         })
 
 
@@ -196,6 +197,13 @@ export default {
         })
 
     },
+    initializeRefPlatform() {
+      // Loop over results to find and set refPlatform
+      const refResult = this.results.find(result => result.resultId === this.test.forwardResultId);
+      if (refResult) {
+        this.refPlatform = refResult.environment;
+      }
+    },
     setAsRef(resultId){
       axios
         .get(this.ApiUrl + '/setTestForwardRef?testId=' + this.testId + '&resultId=' + resultId)
@@ -203,6 +211,10 @@ export default {
           alert(response.data)
           this.initPage()
         })
+    },
+    aboutToShowOnMap(resultId){
+        this.showOnMap(resultId, this.refPlatform ? this.refPlatform.split('-')[0].trim() : '');
+
     }
   },
   mounted(){

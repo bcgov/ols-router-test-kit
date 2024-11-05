@@ -39,8 +39,6 @@ public class Test{
 	String groupName;
 	@Column(name="result_id_fwd_ref")
 	Integer forwardResultId;
-	@Column(name="result_id_rev_ref")
-	Integer reverseResultId;
 	String notes;
 	@Column(name="good_demo_case_ind")
 	Boolean goodDemoCase;
@@ -55,13 +53,12 @@ public class Test{
 
 
 	public Test(int testId, String description, Integer datasetId, String groupName, Integer forwardResultId,
-			Integer reverseResultId, String notes, Boolean rungoodDemoCase, String points, JsonNode parameters) {
+			String notes, Boolean rungoodDemoCase, String points, JsonNode parameters) {
 		super();
 		this.testId = testId;
 		this.description = description;
 		this.groupName = groupName;
 		this.forwardResultId = forwardResultId;
-		this.reverseResultId = reverseResultId;
 		this.notes = notes;
 		this.goodDemoCase = rungoodDemoCase;
 		this.points = points;
@@ -106,15 +103,6 @@ public class Test{
 
 	public void setForwardResultId(Integer forwardResultId) {
 		this.forwardResultId = forwardResultId;
-	}
-
-
-	public Integer getReverseResultId() {
-		return reverseResultId;
-	}
-
-	public void setReverseResultId(Integer reverseResultId) {
-		this.reverseResultId = reverseResultId;
 	}
 
 	public String getNotes() {

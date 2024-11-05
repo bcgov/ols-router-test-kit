@@ -100,7 +100,8 @@
       <!-- Create Dataset Form -->
       <tr>
         <td colspan="2" class="headerColour"><h2>Create a New Dataset</h2>
-          (These values are not used to select a router or dataset version to send requests to, they are only for reference)<br>
+          (These values are not used to select a router or dataset version to send requests to, they are only for reference.
+          <br>The system can now auto-detect and add new datasets when you create a new test run, so it unlikely you need to manualy add these anymore.)<br>
           <router-link :to="{name:'list',params:{objectName:'datasets'}}"> (View existing Datasets)</router-link></td>
       </tr>
       <tr>
@@ -146,7 +147,8 @@
   <table class="table table-striped">
       <tr>
         <td colspan="2" class="headerColour"><h2>Create a New Code Version</h2>
-          (These values are not used to select a router or code version to send requests to, they are only for reference)<br>
+          (These values are not used to select a router or code version to send requests to, they are only for reference. 
+          <br>The system can now auto-detect and add new code versions when you create a new test run, so it unlikely you need to manualy add these anymore.)<br>
           <router-link :to="{name:'list',params:{objectName:'codeVersions'}}"> (View existing Code Versions)</router-link></td>
       </tr>
       <tbody>

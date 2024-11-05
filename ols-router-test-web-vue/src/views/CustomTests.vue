@@ -27,8 +27,7 @@
         <th> Criteria </th>
         <th> Enable </th>
         <th class="hideoverflowbigtd">Other Paramaters</th>
-        <th> Forward Ref? </th>
-        <th> Reverse Ref? </th>
+        <th>Has Forward Ref?</th>
       </tr>
       <tr v-for="test in tests">
         <td>
@@ -44,7 +43,6 @@
            </div>
         </td>
         <td><p v-if="test.forwardResultId">Yes</p><p v-else>No</p></td>
-        <td><p v-if="test.reverseResultId">Yes</p><p v-else>No</p></td>
       </tr>
       
     </tbody>
