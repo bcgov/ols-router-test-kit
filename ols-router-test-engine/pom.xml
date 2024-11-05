@@ -6,7 +6,7 @@
 	<parent>
 		<groupId>ca.bc.gov.ols</groupId>
 		<artifactId>ols-router-test-kit</artifactId>
-		<version>1.0.3-SNAPSHOT</version>
+		<version>1.0.4-SNAPSHOT</version>
 	</parent>
 	<artifactId>ols-router-test-engine</artifactId>
 
