@@ -101,7 +101,18 @@ public class RouterTestingEngine {
 	        	runEveryXSec = 30;//use default
 	        }
 	    }
-
+		
+		
+		//Clean up and mark as failed any runs that were in-progress, but since we are starting this again, they won't be finishing
+		List<Run> cleanupList = runRepository.findByStatusOrderByQueuedTimestamp("inprogress");
+		for (Run run : cleanupList) {
+			run.setStatus("failed");
+			
+			//TODO set number_of_results if we add that to the DB
+			
+			runRepository.save(run);
+		}
+		
 		
 		//Infinite Loop to keep checking for new test run results:
 		while (true) {
@@ -109,7 +120,7 @@ public class RouterTestingEngine {
 			List<Run> runList = runRepository.findByStatusOrderByQueuedTimestamp("queued");
 			int totalCount = runList.size();
 			int count = 0;
-			List<Result> results = null;
+			Boolean success = false;
 	
 			for (Run run : runList) {
 	
@@ -134,9 +145,9 @@ public class RouterTestingEngine {
 					list = (ArrayList<Test>) testRepository.findAllByGroupName(groupName);
 				}
 				System.out.println("Running RunID: " + run.getRunId() + " which entails: " + list.size() + " tests.");
-				results = runTests(saveResults, list, run);
+				success = runTests(saveResults, list, run);
 	
-				if(results != null) {
+				if(success == true) {
 				
 					run.setStatus("complete");
 					run.setRunTimestamp(ZonedDateTime.now());
@@ -158,12 +169,10 @@ public class RouterTestingEngine {
 		}
 	}
 
-	private static List<Result> runTests(Boolean saveResults, List<Test> list, Run run) {
+	private static Boolean runTests(Boolean saveResults, List<Test> list, Run run) {
 		
 		HashMap<String, String> envParameters = getEnvParameters(run.getEnvironmentId());
 		envParameters.put("saveResults", saveResults.toString());
-
-		ArrayList<Result> results = new ArrayList<Result>();
 
 		Map<String, String> parameters = new HashMap<String, String>();
 
@@ -172,9 +181,11 @@ public class RouterTestingEngine {
 		int tenPercent = list.size() / 10;
 		System.out.println("Status: each * is 10% complete for the current run:");
 		for (Test test : list) {
-			if (count == tenPercent) {
+			if (count == tenPercent) { //run for every 10% of progress we achieve
 				System.out.print(" * ");
 				count = 0;
+				System.gc();//encourage garbage collection while running tests
+				//TODO set number_of_results if we add that to the DB
 			}
 			testId = test.getTestId();
 			
@@ -201,8 +212,9 @@ public class RouterTestingEngine {
 				if ("true".equals(envParameters.get("saveResults"))) {
 					resultRepository.save(result);
 					// System.out.println("saved test result.");
+				}else{
+					System.out.println("Result:" +result);
 				}
-				results.add(result);
 			} catch (IOException e) {
 
 				System.out.println("IO Error, invalid URL or parameters");
@@ -215,12 +227,14 @@ public class RouterTestingEngine {
 				}
 
 				e.printStackTrace();
-				return null;
+				return false;
 			}
+			
+			parameters.clear();
 			count++;
 		}
 		System.out.println("");
-		return results;
+		return true;
 	}
 
 	private static Result runSingleTest(Map<String, String> envParameters, Map<String, String> parameters,
@@ -294,6 +308,8 @@ public class RouterTestingEngine {
 		double dis = ((Number)attributes.get("distance")).doubleValue();
 		if (dis > 0){
 			dis = dis * 1000; //only convert to m if value is positive.
+		}else if (dis >= -0.001){
+			dis = -1;
 		}
 
 		Result result = new Result(
