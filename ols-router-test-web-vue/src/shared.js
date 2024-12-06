@@ -15,7 +15,7 @@ export default {
         environments: [],
         groupNameOptions: [],
         codeVersions: [],
-        ApiUrl: "https://ols-route-test-dev.apps.gov.bc.ca/api",
+        ApiUrl: "https://ols-route-test-prod.apps.gov.bc.ca/api",
         debouceTime: 700,
         debounceTimeout: null,
       }
