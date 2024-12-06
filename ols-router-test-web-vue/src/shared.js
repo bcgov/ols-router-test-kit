@@ -77,7 +77,19 @@ export default {
           );
         },       
         show2OnMap(resultId, resultId2, platform) {
-          const combinedResultId = `${resultId},${resultId2}`;
+          let combinedResultId;
+    
+          if (resultId && resultId2) {
+              combinedResultId = `${resultId},${resultId2}`;
+          } else if (resultId) {
+              combinedResultId = resultId;
+          } else if (resultId2) {
+              combinedResultId = resultId2;
+          } else {
+              console.error("Both resultIds are null or undefined, can't display map view.");
+              return; 
+          }
+
           // Open the route in a new window
           window.open(
             this.$router.resolve({
