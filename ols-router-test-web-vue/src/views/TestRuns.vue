@@ -2,8 +2,9 @@
   <main class="container">
     
     <div class="p-1 fw-bold border-bottom mb-2">Test Runs </div>
-    <div>Table Description: A list of completed test runs. Each run shows the date, number of tests, parameters used etc. To compare 2 runs against each other, select the radio button in column "Comp A" on one row, then the radio button in"Comp B" for the 2nd row you wish to compare. Then press the "Compare" button just below this text.</div>
-    <div><button  @click="compareHandler"> Compare</button></div>
+    <div>Table Description: A list of completed test runs. Each run shows the date, number of tests, parameters used etc. To compare 2 runs against each other, select the radio button in column "Comp A" on one row, then the radio button in"Comp B" for the 2nd row you wish to compare. Then press one of the buttons just below this text.</div>
+    <div><button  @click="compareHandler">Detailed Comparison </button></div>
+    <div><button  @click="SummaryHandler">Summary Comparison</button></div>
     <div> &nbsp</div>
     <div> Displaying Rows {{ ((pageNum-1) * perPage) +1 }} to {{ ((pageNum-1) * perPage) + curPageCount }} out of {{rowCount}} rows:</div>
     <table class="table table-striped table-sm">
@@ -67,6 +68,8 @@
               ▲
           </template>
         </th>
+        <th>Code Version Num
+        </th>
         <th class="thLink" @click="setSortBy('dataset')">Dataset
           <template v-if="(sortBy === 'dataset' && descending )">
               ▼
@@ -105,8 +108,9 @@
         <td class="right">{{ run.testCount }}</td>
         <td>{{ run.description }}</td>
         <td>{{ run.environment   }}</td>
+        <td>{{ run.versionNum  }}</td>
         <td> {{ run.dataset }} </td>
-        <td class="centered" v-if="run.forwardRouteInd"> Foward </td>
+        <td class="centered" v-if="run.forwardRouteInd"> Forward </td>
         <td class="centered" v-else> Backward </td>
         <td>{{  run.parameters.criteria }}</td>
         <td>{{  run.parameters.enable }}</td>
@@ -191,9 +195,44 @@ export default {
       axios
         .get(this.ApiUrl + '/runs?pageNumber=' + zeroBasePageNum + '&perPage=' + this.perPage + '&sortBy=' + this.sortBy + '&descending=' + this.descending)
         .then(response => {
-          this.runs = response.data
-          this.curPageCount = this.runs.length 
+            this.runs = response.data;
+            this.curPageCount = this.runs.length;
+
+            // Extract the unique run_ids
+            const runIds = [...new Set(this.runs.map(run => run.runId))];
+
+            //const encodedRunIds = encodeURIComponent(JSON.stringify(runIds));
+            const runIdsStr = runIds.join(',');
+
+            // Call the new API to get version numbers for the run_ids as a single array
+            //Can't sort by version_num this way, but it stops us from over-complicating the server-side query this way...
+            axios
+                .get(this.ApiUrl + '/version-nums', {
+                  params: { runIds: runIdsStr }
+                  //params: { runIds: encodedRunIds }  // URL-encoded runIds?
+                })  // Send runIds as a single array
+                .then(versionResponse => {
+                    const versionMap = new Map();
+
+                    // Create a mapping of run_id to version_num
+                    versionResponse.data.forEach((version, index) => {
+                        versionMap.set(runIds[index], version);
+                    });
+
+                    // Update the runs with the versionNum property
+                    this.runs.forEach(run => {
+                        run.versionNum = versionMap.get(run.runId) || null;  // Assign versionNum or null if not found
+                    });
+                })
+                .catch(error => {
+                    console.error('Error fetching version numbers:', error);
+                });
         })
+        .catch(error => {
+            console.error('Error fetching runs:', error);
+        });
+
+
 
         axios
         .get(this.ApiUrl + '/runsCount')
@@ -211,6 +250,14 @@ export default {
         return
       }
       this.$router.push({ name:'compareRuns' , params:{runIdA:this.compareA, runIdB:this.compareB} })
+    },
+
+    SummaryHandler(){
+      if(this.compareA == null || this.compareB == null){
+        alert('Select a row for each "Comp A" and "Comp B" columns and try again.')
+        return
+      }
+      this.$router.push({ name:'partitionSummary' , params:{runIdA:this.compareA, runIdB:this.compareB} })
     },
     referenceHandler(runId){
       this.$router.push({ name:'compareToRefs' , params:{runId:runId} })

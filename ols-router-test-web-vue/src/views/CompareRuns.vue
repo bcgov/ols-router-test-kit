@@ -48,14 +48,22 @@
             </template>
           </th>
 
-          <th colspan="3" class="thLink rightborder" @click="setSortBy('partition_diff')"> Partition Sig
-            <template v-if="(this.sortBy === 'partition_diff' && this.descending )">
+          <th colspan="3" class="thLink rightborder">
+            <span @click="setSortBy('partition_diff')" style="cursor: pointer;">
+              Partition Sig
+              <template v-if="sortBy === 'partition_diff' && descending">
                 ▼
-            </template>
-            <template v-if="(this.sortBy === 'partition_diff' && !this.descending )">
+              </template>
+              <template v-if="sortBy === 'partition_diff' && !descending">
                 ▲
-            </template>
+              </template>
+            </span>
+            <!-- <div>
+              <input type="checkbox" id="onlyShowDiffs" v-model="onlyShowDifferences">
+              <label class="smallText" for="onlyShowDiffs">Hide 0% Diff</label>
+            </div> -->
           </th>
+
           <th></th>
           <th></th>
           <th></th>
@@ -143,7 +151,8 @@
           <th> Map</th>
         </tr>
 
-        <tr v-for="result in results" >  
+        <template v-for="result in results" :key="result?.a_test_id">
+          <tr>
             <td class="rightborder centered"> <router-link :to="{name:'test',params:{testId:result.a_test_id}}">{{ result.a_test_id }} </router-link> </td>
 
             <td class="right"> {{ (result.a_distance ?? 0).toFixed(0)}} </td>
@@ -151,7 +160,7 @@
             <td class="right"> {{ (result.distance_diff ?? 0).toFixed(0)  }}</td>
             <td class="rightborder right"> {{ (result.distance_perc ?? 0).toFixed(0) }} </td>
 
-            <td class="right"> {{ result.hausdorff_distance}} </td>
+            <td class="rightborder right"> {{ result.hausdorff_distance}} </td>
 
             <td class="right"> {{ (result.a_duration ?? 0).toFixed(0)}} </td>
             <td class="right"> {{ (result.b_duration ?? 0).toFixed(0) }}</td>
@@ -160,8 +169,7 @@
 
             <td class="right"> {{ result.a_calc_time}} </td>
             <td class="right"> {{ result.b_calc_time }}</td>
-            <td class="right"> {{ (result.calc_time_diff ?? 0).toFixed(0)
-  }}</td>
+            <td class="right"> {{ (result.calc_time_diff ?? 0).toFixed(0)}}</td>
             <td class="rightborder right"> {{ (result.calc_time_perc ?? 0).toFixed(0) }} </td>
 
             <td class="right"> {{ result.a_partition_signature}} </td>
@@ -171,7 +179,8 @@
             <td> {{ result.description}} </td>
             <td> {{ result.notes}}</td>
             <td> <button @click="show2OnMap(result.a_result_id, result.b_result_id, environment.platform )">View on Map</button></td>
-        </tr>
+          </tr>
+        </template>
       </tbody>
     </table>
 
@@ -209,6 +218,7 @@ export default {
       dataset:{},
       results:{},
       loading: false,
+      onlyShowDifferences: false,
     }
 
   },
@@ -238,7 +248,7 @@ export default {
       this.loading = true; // show loading msg
       var zeroBasePageNum = this.pageNum - 1
       axios
-        .get(this.ApiUrl + '/compareRuns?runIdA=' + this.runIdA + '&runIdB=' + this.runIdB + '&pageNumber=' + zeroBasePageNum + '&perPage=' + this.perPage + '&sortBy=' + this.sortBy + '&descending=' + this.descending)
+        .get(this.ApiUrl + '/compareRuns?runIdA=' + this.runIdA + '&runIdB=' + this.runIdB + '&pageNumber=' + zeroBasePageNum + '&perPage=' + this.perPage + '&sortBy=' + this.sortBy + '&descending=' + this.descending + "&onlyShowDifferences=" +this.onlyShowDifferences)
         .then(response =>{
           this.results = response.data
           this.curPageCount = this.results.length 
