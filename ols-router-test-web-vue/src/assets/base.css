@@ -116,6 +116,17 @@ body {
 .table-striped tr:nth-of-type(even) {
   background: var(--color-background);
 }
+
+.table-striped2 tr:nth-of-type(4n-3),
+.table-striped2 tr:nth-of-type(4n-2) {
+  background: var(--color-background-mute);
+}
+
+.table-striped2 tr:nth-of-type(4n-1),
+.table-striped2 tr:nth-of-type(4n) {
+  background: var(--color-background);
+}
+
 .table-noborder{
   border: 0px;
   border-collapse:collapse;

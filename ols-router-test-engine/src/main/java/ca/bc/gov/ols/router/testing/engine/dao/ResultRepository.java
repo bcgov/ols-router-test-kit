@@ -43,7 +43,59 @@ public interface ResultRepository extends JpaRepository <Result, Integer> {
 		  + "  JOIN Test t on b.testId = t.testId"
 		  + " WHERE a.runId = :runIdA AND b.runId = :runIdB")
 	List<Map> compareResultsOfRunIds(@Param("runIdA") Integer runIdA, @Param("runIdB") Integer runIdB, Pageable pageable);
+
 	
+	//starting to do a version that can filter out no-diff signatures, probably more time than we want to spend so I stopped, but if we come back to it, it's here...
+//	@Query(value ="SELECT a.resultId as a_result_id, a.testId as a_test_id, a.calcTime as a_calc_time, a.distance as a_distance, a.duration as a_duration,"
+//			+ "b.resultId as b_result_id, b.calcTime as b_calc_time, b.distance as b_distance, b.duration as b_duration, "
+//			+ "COALESCE((b.distance - a.distance), -1) as distance_diff, "
+//			+ "COALESCE((100*(b.distance - a.distance)/greatest(a.distance,1)), -1) as distance_perc,"
+//		    + "COALESCE((b.duration - a.duration), -1) as duration_diff,"
+//		    + "COALESCE((100*(b.duration - a.duration)/greatest(a.duration,1)), -1) as duration_perc,"
+//		    + "COALESCE((b.calcTime - a.calcTime), -1) as calc_time_diff,"
+//		    + "COALESCE((100*(b.calcTime - a.calcTime)/greatest(a.calcTime, 1)), -1) as calc_time_perc,"
+//		    + "COALESCE(ST_HausdorffDistance(ST_Simplify(a.routeGeometry, 0.0002), ST_Simplify(b.routeGeometry, 0.0002)) * 91000, -1) as hausdorff_distance,"
+//		    + "function('get_binary_partition_sig', a.partitionInfo ,'isTruckRoute') as a_partition_signature, "
+//		    + "function('get_binary_partition_sig', b.partitionInfo ,'isTruckRoute') as b_partition_signature, "
+//	        + "COALESCE((100 * (LENGTH(CAST(function('get_binary_partition_sig', b.partitionInfo ,'isTruckRoute') AS string)) - LENGTH(CAST(function('get_binary_partition_sig', a.partitionInfo ,'isTruckRoute') AS string))) / GREATEST(LENGTH(CAST(function('get_binary_partition_sig', a.partitionInfo ,'isTruckRoute') AS string)), 1)), 1) AS partition_diff, "
+//		    + "t.description as description, t.notes as notes"
+//		  + " FROM Result a JOIN Result b on a.testId = b.testId"
+//		  + "  JOIN Test t on b.testId = t.testId"
+//		  + " WHERE a.runId = :runIdA AND b.runId = :runIdB"
+//		  + " AND (:onlyShowDifferences = false OR partition_diff != 0)")
+//	List<Map> compareResultsOfRunIds(
+//	    @Param("runIdA") Integer runIdA, 
+//	    @Param("runIdB") Integer runIdB, 
+//	    @Param("onlyShowDifferences") boolean onlyShowDifferences, 
+//	    Pageable pageable);
+
+	
+	/*
+	 * Query that summarizes total occurrences of each unique signature, per run ID. So you can quickly see the overall similarity or differences across an entire pair of Runs
+	 */
+
+	@Query(value = "SELECT function('get_binary_partition_sig', r.partitionInfo, 'isTruckRoute') AS partition_signature, " +
+			"CHAR_LENGTH(function('get_binary_partition_sig', r.partitionInfo, 'isTruckRoute') ) AS signature_length, " + 
+            "r.runId AS run_id, " +
+            "COUNT(*) AS count " +
+            "FROM Result r " +
+            "WHERE r.runId IN (:runIdA, :runIdB) " +
+            "GROUP BY partition_signature, run_id " +
+            "ORDER BY signature_length, partition_signature, run_id")
+	List<Map> getPartitionSignatureSummary(@Param("runIdA") Integer runIdA, @Param("runIdB") Integer runIdB);
+
+
+	@Query(value = "SELECT r1.testId AS test_id, " +
+	        "function('get_binary_partition_sig', r1.partitionInfo, 'isTruckRoute') AS signatureA, " +
+	        "function('get_binary_partition_sig', r2.partitionInfo, 'isTruckRoute') AS signatureB " +
+	        "FROM Result r1 " +
+	        "LEFT JOIN Result r2 ON r1.testId = r2.testId AND r2.runId = :runIdB " +
+	        "WHERE r1.runId = :runIdA " +
+	        "AND function('get_binary_partition_sig', r1.partitionInfo, 'isTruckRoute') " +
+	        "    <> function('get_binary_partition_sig', r2.partitionInfo, 'isTruckRoute') " +
+	        "ORDER BY r1.testId")
+	List<Map> getMismatchedPartitionSignatures(@Param("runIdA") Integer runIdA, @Param("runIdB") Integer runIdB);
+
 	
 	/*
 	 * Query that gets all results for given run ID

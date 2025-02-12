@@ -121,6 +121,23 @@ public class ApiController {
 		
 	}
 	
+	/* get a list of code versions used buy the list of run_ids provided
+	 * Used to fill out code-version on the main runs view without over-complicating the main pageable/sorted query
+	 * */ 
+	@RequestMapping("/version-nums")
+	@JsonView(View.Default.class)
+	public List<String> getVersionNumsByRunIds(@RequestParam List<Integer> runIds) {
+	    try {
+	        // Call the service method that invokes the repository query
+	        List<String> versionNums = runRepository.findVersionNumsByRunIds(runIds);
+
+	        // Return the list of version numbers
+	        return versionNums;
+	    } catch (Exception e) {
+	        throw new InvalidParameterException("Error fetching version numbers. " + e.getMessage());
+	    }
+	}
+	
 	/**
 	 * Returns a paged, sorted list of Result entities from the DB in Json format
 	 * @param PageNumber - the page number of data you are requesting 
@@ -404,6 +421,35 @@ public class ApiController {
 			throw new InvalidParameterException("Invalid parameter value given. " + e.getMessage());
 		}
 	}
+	
+	/**
+	 * Returns a summary of partition signatures for 2 given run IDs.
+	 * @param runIdA - the ID for the first run  
+	 * @param runIdB - the ID for the second run
+	 */
+	@RequestMapping("/partitionSummary")
+	public List<Map> getPartitionSignatureSummary(@RequestParam int runIdA, @RequestParam int runIdB) {
+	    try {
+	        return resultRepository.getPartitionSignatureSummary(runIdA, runIdB);
+	    } catch (Exception e) {
+	        throw new InvalidParameterException("Invalid parameter value given. " + e.getMessage());
+	    }
+	}
+	
+	/**
+	 * Returns a summary of test_id that have mismatched signature for 2 given run IDs.
+	 * @param runIdA - the ID for the first run  
+	 * @param runIdB - the ID for the second run
+	 */
+	@RequestMapping("/getMismatchedPartitionSignatures")
+	public List<Map> getMismatchedPartitionSignatures(@RequestParam int runIdA, @RequestParam int runIdB) {
+	    try {
+	        return resultRepository.getMismatchedPartitionSignatures(runIdA, runIdB);
+	    } catch (Exception e) {
+	        throw new InvalidParameterException("Invalid parameter value given. " + e.getMessage());
+	    }
+	}
+
 	
 	/**
 	 * Returns the count of rows for the comparison of 2 given run IDs 

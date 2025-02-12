@@ -7,6 +7,7 @@ import Results from './views/Results.vue'
 import Test from './views/Test.vue'
 import Run from './views/Run.vue'
 import CompareRuns from './views/CompareRuns.vue'
+import PartitionSummary from './views/PartitionSummary.vue'
 import CompareToRefs from './views/CompareToRefs.vue'
 import CreateNew from './views/CreateNew.vue'
 import CreateRun from './views/CreateRun.vue'
@@ -53,6 +54,12 @@ const router = createRouter({
       name: 'compareRuns',
       props: (route) => ({ runIdA: Number(route.params.runIdA) , runIdB: Number(route.params.runIdB)}),
       component: CompareRuns
+    },
+    {
+      path: '/partitionSummary/:runIdA/:runIdB',
+      name: 'partitionSummary',
+      props: (route) => ({ runIdA: Number(route.params.runIdA) , runIdB: Number(route.params.runIdB)}),
+      component: PartitionSummary
     },
     {
       path: '/compareToRefs/:runId',

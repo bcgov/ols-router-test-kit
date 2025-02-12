@@ -1,6 +1,7 @@
 package ca.bc.gov.ols.router.testing.engine.entity;
 
 import java.time.ZonedDateTime;
+import java.util.List;
 import java.util.Map;
 
 import org.hibernate.annotations.JdbcTypeCode;
@@ -77,12 +78,6 @@ public class Run{
 		this.queuedTimestamp = queuedTimestamp;
 		this.status = status;
 	}
-
-
-
-
-
-
 
 
 	public int getRunId() {
