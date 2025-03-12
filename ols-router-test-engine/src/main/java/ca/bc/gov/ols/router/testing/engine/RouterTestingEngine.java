@@ -180,6 +180,11 @@ public class RouterTestingEngine {
 		int count = 0;
 		int tenPercent = list.size() / 10;
 		System.out.println("Status: each * is 10% complete for the current run:");
+		
+		//setup an overall exception max, so we fail if we keep getting DNS errors (or others) consistently throughout the retry process.
+		int exceptionCount = 0;
+		final int MAX_EXCEPTIONS = 100;
+		
 		for (Test test : list) {
 			if (count == tenPercent) { //run for every 10% of progress we achieve
 				System.out.print(" * ");
@@ -205,30 +210,58 @@ public class RouterTestingEngine {
 					parameters.put("points", test.getPoints().replace(' ', ','));
 				}
 			}
-			try {
-				Result result = runSingleTest(envParameters, parameters, run.getRunId(), testId);
+			
+			//setup a retry system for each test that waits longer each time it fails
+			int[] retryDelays = {1, 20, 60, 180, 360}; // Retry delays in seconds
 
-				// save the results to the DB if we're supposed to
-				if ("true".equals(envParameters.get("saveResults"))) {
-					resultRepository.save(result);
-					// System.out.println("saved test result.");
-				}else{
-					System.out.println("Result:" +result);
-				}
-			} catch (IOException e) {
 
-				System.out.println("IO Error, invalid URL or parameters");
-				System.out.println("Test ID:" + testId);
-				try {
-					System.out
-							.println("Failed when testing URL: " + ParameterStringBuilder.getParamsString(parameters));
-				} catch (UnsupportedEncodingException e1) {
-					e1.printStackTrace();
-				}
+			for (int attempt = 0; attempt < retryDelays.length; attempt++) {
+			    try {
+			        Result result = runSingleTest(envParameters, parameters, run.getRunId(), testId);
 
-				e.printStackTrace();
-				return false;
+			        // Save the results to the DB if we're supposed to
+			        if ("true".equals(envParameters.get("saveResults"))) {
+			            resultRepository.save(result);
+			        } else {
+			            System.out.println("Result: " + result);
+			        }
+
+			        break;//successful run, get out of exception-retry loop and go to the next test.
+
+			    } catch (IOException e) {
+			        exceptionCount++;
+			        if (exceptionCount >= MAX_EXCEPTIONS) {
+			            System.out.println("Too many exceptions encountered throughout overall run(100). Aborting.");
+			            return false;
+			        }
+
+			        System.out.println("IO Error, invalid URL or parameters? or potentially a DNS error?");
+			        System.out.println("Test ID: " + testId);
+
+			        try {
+			            System.out.println("Failed when testing URL: " + ParameterStringBuilder.getParamsString(parameters));
+			        } catch (UnsupportedEncodingException e1) {
+			            e1.printStackTrace();
+			        }
+
+			        e.printStackTrace();
+
+			        if (attempt < retryDelays.length - 1) { // If not the last attempt, wait before retrying
+			            try {
+			            	System.out.println("Re-Trying request, attempt #" + (attempt+1) + "/5");
+			                Thread.sleep(retryDelays[attempt] * 1000L);
+			            } catch (InterruptedException ie) {
+			                Thread.currentThread().interrupt();
+			                return false;
+			            }
+			        }else {
+			        	return false; // Longest wait/retry failed
+			        }
+			    }
 			}
+
+			
+
 			
 			parameters.clear();
 			count++;

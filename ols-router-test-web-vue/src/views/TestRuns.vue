@@ -68,7 +68,7 @@
               ▲
           </template>
         </th>
-        <th>Code Version Num
+        <th>Code Version Num (Github Commit ID)
         </th>
         <th class="thLink" @click="setSortBy('dataset')">Dataset
           <template v-if="(sortBy === 'dataset' && descending )">
