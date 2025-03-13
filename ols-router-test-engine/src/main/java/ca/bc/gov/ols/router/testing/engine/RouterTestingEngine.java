@@ -231,12 +231,12 @@ public class RouterTestingEngine {
 			    } catch (IOException e) {
 			        exceptionCount++;
 			        if (exceptionCount >= MAX_EXCEPTIONS) {
+				        System.out.println("Aborting overall process during Test ID: " + testId);
 			            System.out.println("Too many exceptions encountered throughout overall run(100). Aborting.");
+			            e.printStackTrace();
 			            return false;
 			        }
-
-			        System.out.println("IO Error, invalid URL or parameters? or potentially a DNS error?");
-			        System.out.println("Test ID: " + testId);
+			        
 
 			        try {
 			            System.out.println("Failed when testing URL: " + ParameterStringBuilder.getParamsString(parameters));
@@ -244,7 +244,6 @@ public class RouterTestingEngine {
 			            e1.printStackTrace();
 			        }
 
-			        e.printStackTrace();
 
 			        if (attempt < retryDelays.length - 1) { // If not the last attempt, wait before retrying
 			            try {
@@ -255,6 +254,9 @@ public class RouterTestingEngine {
 			                return false;
 			            }
 			        }else {
+			        	System.out.println("Aborting overall process during Test ID: " + testId);
+			        	System.out.println("Reached max wait time on this request. Aborting.");
+			        	e.printStackTrace();
 			        	return false; // Longest wait/retry failed
 			        }
 			    }
