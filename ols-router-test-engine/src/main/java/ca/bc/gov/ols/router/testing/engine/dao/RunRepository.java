@@ -22,12 +22,17 @@ import jakarta.persistence.Column;
 @Component
 public interface RunRepository extends JpaRepository<Run, Integer> {
 
+	
 	List<Run> findByStatusOrderByQueuedTimestamp(String string);
-	@Query("SELECT cv.versionNum " +
-	           "FROM Run r JOIN CodeVersion cv ON r.codeId = cv.codeId " +
-	           "WHERE r.runId IN :runIds")
+	
+	
+	@Query("SELECT CONCAT(COALESCE(cv.versionNum, ''), ' (', COALESCE(cv.githubCommitId, ''), ')') " +
+		       "FROM Run r JOIN CodeVersion cv ON r.codeId = cv.codeId " +
+		       "WHERE r.runId IN :runIds")
 	List<String> findVersionNumsByRunIds(@Param("runIds") List<Integer> runIds);
 
+
+	
 	
 	/*
 	 * Query that gets the main run table with sub-queries etc
