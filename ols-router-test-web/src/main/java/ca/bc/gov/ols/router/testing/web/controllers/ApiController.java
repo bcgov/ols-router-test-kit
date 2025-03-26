@@ -11,6 +11,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Optional;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import java.time.ZonedDateTime;
 
@@ -126,16 +127,33 @@ public class ApiController {
 	 * */ 
 	@RequestMapping("/version-nums")
 	@JsonView(View.Default.class)
+//	public List<String> getVersionNumsByRunIds(@RequestParam List<Integer> runIds) {
+//	    try {
+//	        // Call the service method that invokes the repository query
+//	        List<String> versionNums = runRepository.findVersionNumsByRunIds(runIds);
+//
+//	        // Return the list of version numbers
+//	        return versionNums;
+//	    } catch (Exception e) {
+//	        throw new InvalidParameterException("Error fetching version numbers. " + e.getMessage());
+//	    }
+//	}
+	
 	public List<String> getVersionNumsByRunIds(@RequestParam List<Integer> runIds) {
-	    try {
-	        // Call the service method that invokes the repository query
-	        List<String> versionNums = runRepository.findVersionNumsByRunIds(runIds);
-
-	        // Return the list of version numbers
-	        return versionNums;
-	    } catch (Exception e) {
-	        throw new InvalidParameterException("Error fetching version numbers. " + e.getMessage());
+	    List<Object[]> results = runRepository.findVersionNumsByRunIds(runIds);
+	    
+	    // Convert to a Map (runId -> versionNum)
+	    Map<Integer, String> versionMap = new HashMap<>();
+	    for (Object[] row : results) {
+	        Integer runId = (Integer) row[0];
+	        String versionNum = (String) row[1];
+	        versionMap.put(runId, versionNum);
 	    }
+
+	    // Ensure result order matches input `runIds`
+	    return runIds.stream()
+	        .map(id -> versionMap.getOrDefault(id, "N/A"))  // Provide a default if missing
+	        .collect(Collectors.toList());
 	}
 	
 	/**
