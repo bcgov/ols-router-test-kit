@@ -25,12 +25,11 @@ public interface RunRepository extends JpaRepository<Run, Integer> {
 	
 	List<Run> findByStatusOrderByQueuedTimestamp(String string);
 	
-	
-	@Query("SELECT CONCAT(COALESCE(cv.versionNum, ''), ' (', COALESCE(cv.githubCommitId, ''), ')') " +
-		       "FROM Run r JOIN CodeVersion cv ON r.codeId = cv.codeId " +
-		       "WHERE r.runId IN :runIds")
-	List<String> findVersionNumsByRunIds(@Param("runIds") List<Integer> runIds);
 
+	@Query("SELECT r.runId, CONCAT(COALESCE(cv.versionNum, ''), ' (', COALESCE(cv.githubCommitId, ''), ')') " +
+		       "FROM Run r LEFT JOIN CodeVersion cv ON r.codeId = cv.codeId " +
+		       "WHERE r.runId IN :runIds")
+	List<Object[]> findVersionNumsByRunIds(@Param("runIds") List<Integer> runIds);
 
 	
 	
